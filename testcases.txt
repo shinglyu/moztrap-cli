@@ -1,0 +1,2 @@
+suite url: https://moztrap.mozilla.org/api/v1/caseversion/?case__suites=775&format=json
+case id: 88
