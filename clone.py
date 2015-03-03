@@ -2,6 +2,8 @@ import urllib2
 import json
 import logging
 
+import orm
+
 productversion="v2.2" #FIXME: hardcoded
 
 def downloadCaseversionById(cid):
@@ -25,44 +27,19 @@ def downloadSuiteById(sid):
     return json.loads(data)
 
 
-def formatCaseversion(caseversion):
-    txt = ("TEST THAT {name}\n"
-           "{desc}\n"
-           "\n"
-          ).format(name=caseversion['name'],
-                   desc=caseversion['description'])
-    for step in caseversion['steps']:
-        txt += ("WHEN {instr}\n"
-                "THEN {expected}\n"
-                "\n"
-               ).format(instr=step['instruction'],
-                        expected=step['expected'])
-    return txt
-
-
-def formatSuite(suite):
-    # TODO: sort by product version
-    sortedCaseVersions= sorted(suite['objects'], key=lambda k: k['productversion'])
-    txt = ""
-    for caseversion in sortedCaseVersions:
-        txt += formatCaseversion(caseversion)
-        txt += "\n=====\n\n"
-    return txt
-
-
 def clone(args):
     output = ""
     if args.resource_type == "caseversion":
         query = str(args.id)
         logging.info("Downloading CaseVersion " + query + " ...")
         result = downloadCaseversionById(query)
-        output = formatCaseversion(result)
+        output = orm.formatCaseversion(result)
 
     elif args.resource_type == "suite":
         query = str(args.id)
         logging.info("Downloading Suite " + query + " ...")
         result = downloadSuiteById(query)
-        output = formatSuite(result)
+        output = orm.formatSuite(result)
 
     filename = args.resource_type + "_" + str(args.id) + ".txt"
     # TODO: confirm before overwrite
