@@ -1,10 +1,14 @@
 import urllib2
 import json
+import os
 import logging
 
 import orm
 
 productversion="v2.2" #FIXME: hardcoded
+
+
+
 
 def downloadCaseversionById(cid):
     # query = query.replace(" ", "\%20")
@@ -27,22 +31,33 @@ def downloadSuiteById(sid):
     return json.loads(data)
 
 
-def clone(args):
+def clone(resource_type, sid, dirname="./"):
     output = ""
-    if args.resource_type == "caseversion":
-        query = str(args.id)
+    if resource_type == "caseversion":
+        query = str(sid)
         logging.info("Downloading CaseVersion " + query + " ...")
         result = downloadCaseversionById(query)
         output = orm.formatCaseversion(result)
 
-    elif args.resource_type == "suite":
-        query = str(args.id)
+    elif resource_type == "suite":
+        query = str(sid)
         logging.info("Downloading Suite " + query + " ...")
         result = downloadSuiteById(query)
-        output = orm.formatSuite(result)
+        output = orm.formatSuite(result, sid)
 
-    filename = args.resource_type + "_" + str(args.id) + ".txt"
-    # TODO: confirm before overwrite
+    filename = dirname + resource_type + "_" + str(sid) + ".txt"
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
     with open(filename, 'w') as file_:
             file_.write(output)
     logging.info(filename + " created")
+
+
+def cloneByURL(url, dirname="./"):
+    import re
+    p = re.compile(ur'\/api\/v1\/(.*)\/(.*)\/')
+    (resource_type, rid) = re.findall(p, url)[0]
+
+    clone(resource_type, rid, dirname)
+
+

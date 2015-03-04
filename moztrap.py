@@ -3,6 +3,7 @@ import argparse
 import logging
 
 import clone
+import diff
 
 logging.basicConfig(level=logging.INFO)
 
@@ -30,9 +31,9 @@ def main():
 
     # print args
     if args.action == "clone":
-        clone.clone(args)
+        clone.clone(args.resource_type, args.id)
     elif args.action == "diff":
-        raise NotImplementedError
+        diff.diff(args)
     elif args.action == "push":
         raise NotImplementedError
 
