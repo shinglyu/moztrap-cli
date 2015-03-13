@@ -7,13 +7,12 @@ import orm
 
 productversion="v2.2" #FIXME: hardcoded
 
-
-
+mtorigin = "https://moztrap.mozilla.org"
 
 def downloadCaseversionById(cid):
     # query = query.replace(" ", "\%20")
     # baseurl = "https://developer.mozilla.org/en-US/search?format=json&q="
-    baseURL = "https://moztrap.mozilla.org/api/v1/caseversion/"
+    baseURL = mtorigin + "/api/v1/caseversion/"
     url = baseURL + str(cid) + "/"
     url = url + "/?format=json"
     data = urllib2.urlopen(url).read()
@@ -23,7 +22,7 @@ def downloadCaseversionById(cid):
 def downloadSuiteById(sid):
     # query = query.replace(" ", "\%20")
     # baseurl = "https://developer.mozilla.org/en-US/search?format=json&q="
-    url = ("https://moztrap.mozilla.org/api/v1/caseversion/"
+    url = (mtorigin + "/api/v1/caseversion/"
            "?case__suites={sid}&productversion__version={productversion}"
            "&limit=0&format=json"
           ).format(sid=sid, productversion=productversion)
@@ -54,9 +53,7 @@ def clone(resource_type, sid, dirname="./"):
 
 
 def cloneByURL(url, dirname="./"):
-    import re
-    p = re.compile(ur'\/api\/v1\/(.*)\/(.*)\/')
-    (resource_type, rid) = re.findall(p, url)[0]
+    (resource_type, rid) = orm.parseURL(url)
 
     clone(resource_type, rid, dirname)
 

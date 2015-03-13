@@ -14,7 +14,9 @@ def diff(args):
     meta = json.loads(firstline)
 
     latestdir="./latest/"
+    # TODO: maybe we can use orm.parseURL here and remove the cloneByURL method
     clone.cloneByURL(meta[u'resource_uri'], latestdir)
 
     os.system(difftool + " " + filename + " " + latestdir + filename)
     # call os.system('vimdiff')
+

@@ -1,3 +1,4 @@
+import re
 import logging
 
 def formatCaseversion(caseversion):
@@ -15,7 +16,15 @@ def formatCaseversion(caseversion):
                         expected=step['expected'])
     return txt
 
+
 def parseCaseversion(caseversion_txt):
+    p = re.compile(ur'TEST THAT(.*?)\n(.*?)(WHEN.*)', re.IGNORECASE | re.DOTALL)
+
+    (title, desc, steps_txt) = re.findall(p, caseversion_txt)[0]
+
+    sre = re.compile(ur'WHEN(.*?)THEN(.*?)\n', re.IGNORECASE | re.DOTALL)
+    steps = re.findall(sre, steps_txt)
+    # TODO: compose it as a valid moztrap json
     raise NotImplementedError
 
 
@@ -28,3 +37,8 @@ def formatSuite(suite, sid):
         txt += "\n=====\n\n"
     return txt
 
+
+def parseURL(url):
+    import re
+    p = re.compile(ur'\/api\/v1\/(.*)\/(.*)\/')
+    return  re.findall(p, url)[0] # (resource_type, rid)
