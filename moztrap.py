@@ -34,6 +34,9 @@ def main():
     elif args.action == "diff":
         diff.diff(args)
     elif args.action == "push":
+        if not args.force:
+            raise Exception("Push will force override everything on the server."
+                             + " Use \"push -f\" to acknowledge the risk")
         mtapi.push(args.filename)
 
 

@@ -66,26 +66,13 @@ def cloneByURL(url, dirname="./"):
 #Upload
 
 def push(filename):
-    # Read the file
-    # Determine its type (caseversion? suite?)
-    # Call forcePushCaseversion or forcePushSuite
-    # http_connection = httplib.HTTPConnection(mtorigin, mtport)
     with open(filename, 'r') as f:
+        # Determine its type (caseversion? suite?)
         caseversion = orm.parseCaseversion(''.join(f.readlines()))
+        # Call forcePushCaseversion or forcePushSuite
         forcePushCaseversion(caseversion, requests)
 
 
 def forcePushCaseversion(caseversion, requestlib):
-    # http_connection(mtorigin, mtport)
-    # http_connection.request("PUT", "/api/v1/caseversion/88", caseversion)
-    # request = urllib2.Request(mtorigin, data=json.dumps(caseversion))
-
-#    request = urllib2.Request(mtorigin, data=caseversion)
-#    request.add_header('Content-Type', 'text/json')
-#    request.get_method = lambda: 'PUT'
-#    url = opener.open(request)
+    # Make sure the number of steps equal
     requestlib.put(mtorigin, data=json.dumps(caseversion))
-
-    # http_connection.request("GET", "/api/v1/caseversion/88", caseversion)
-    # response = http_connection.getresponse();
-    #logging.info(url)
