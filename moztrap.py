@@ -26,7 +26,6 @@ def main():
     parser_push.add_argument('-f', '--force', action="store_true",
                              help="Force overwrite (BE CAREFUL!)")
     parser_push.add_argument('filename', type=str, help="File to be pushed")
-
     args = parser.parse_args()
 
     # print args
@@ -35,7 +34,7 @@ def main():
     elif args.action == "diff":
         diff.diff(args)
     elif args.action == "push":
-        raise NotImplementedError
+        mtapi.push(args.filename)
 
 
 if __name__ == '__main__':

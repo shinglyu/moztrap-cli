@@ -1,14 +1,19 @@
 import urllib2
 import json
 import os
+import httplib
 import logging
+import requests
 
 import orm
 
 productversion="v2.2" #FIXME: hardcoded
 
-mtorigin = "https://moztrap.mozilla.org"
+# mtorigin = "https://moztrap.mozilla.org"
+# mtorigin = "http://0.0.0.0:8080"
+mtorigin = "http://requestb.in/1b8n1md1"
 
+# Download
 def downloadCaseversionById(cid):
     # query = query.replace(" ", "\%20")
     # baseurl = "https://developer.mozilla.org/en-US/search?format=json&q="
@@ -58,3 +63,29 @@ def cloneByURL(url, dirname="./"):
     clone(resource_type, rid, dirname)
 
 
+#Upload
+
+def push(filename):
+    # Read the file
+    # Determine its type (caseversion? suite?)
+    # Call forcePushCaseversion or forcePushSuite
+    # http_connection = httplib.HTTPConnection(mtorigin, mtport)
+    with open(filename, 'r') as f:
+        caseversion = orm.parseCaseversion(''.join(f.readlines()))
+        forcePushCaseversion(caseversion, requests)
+
+
+def forcePushCaseversion(caseversion, requestlib):
+    # http_connection(mtorigin, mtport)
+    # http_connection.request("PUT", "/api/v1/caseversion/88", caseversion)
+    # request = urllib2.Request(mtorigin, data=json.dumps(caseversion))
+
+#    request = urllib2.Request(mtorigin, data=caseversion)
+#    request.add_header('Content-Type', 'text/json')
+#    request.get_method = lambda: 'PUT'
+#    url = opener.open(request)
+    requestlib.put(mtorigin, data=json.dumps(caseversion))
+
+    # http_connection.request("GET", "/api/v1/caseversion/88", caseversion)
+    # response = http_connection.getresponse();
+    #logging.info(url)

@@ -3,6 +3,7 @@ import json
 import logging
 
 def formatCaseversion(caseversion):
+    # Downloaded json obj => plaintext
     txt = "{{ \"resource_uri\":\"{uri}\" }}\n".format(uri=caseversion[u'resource_uri'])
     txt += ("TEST THAT {name}\n"
            "{desc}\n"
@@ -19,6 +20,7 @@ def formatCaseversion(caseversion):
 
 
 def parseCaseversion(caseversion_txt):
+    # plaintext => json obj
     def parseStep((index, step_txt)):
         step = {}
         step["instruction"] = step_txt[0].strip()
@@ -39,7 +41,6 @@ def parseCaseversion(caseversion_txt):
     return json.loads(json.dumps(caseversion))
     #return json.dumps(caseversion)
     # TODO: compose it as a valid moztrap json
-    raise NotImplementedError
 
 
 def formatSuite(suite, sid):
