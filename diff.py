@@ -15,7 +15,7 @@ def diff(args):
 
     latestdir="./latest/"
     # TODO: maybe we can use orm.parseURL here and remove the cloneByURL method
-    clone.cloneByURL(meta[u'resource_uri'], latestdir)
+    mtapi.cloneByURL(meta[u'resource_uri'], latestdir)
 
     os.system(difftool + " " + filename + " " + latestdir + filename)
     # call os.system('vimdiff')
