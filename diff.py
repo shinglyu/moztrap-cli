@@ -2,7 +2,7 @@ import json
 import os
 import logging
 
-import clone
+import mtapi
 
 difftool="vimdiff"
 

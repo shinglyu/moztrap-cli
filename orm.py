@@ -1,4 +1,5 @@
 import re
+import json
 import logging
 
 def formatCaseversion(caseversion):
@@ -18,12 +19,25 @@ def formatCaseversion(caseversion):
 
 
 def parseCaseversion(caseversion_txt):
+    def parseStep((index, step_txt)):
+        step = {}
+        step["instruction"] = step_txt[0].strip()
+        step["expected"] = step_txt[1].strip()
+        step["number"] = index
+        return step
+
     p = re.compile(ur'TEST THAT(.*?)\n(.*?)(WHEN.*)', re.IGNORECASE | re.DOTALL)
 
     (title, desc, steps_txt) = re.findall(p, caseversion_txt)[0]
 
     sre = re.compile(ur'WHEN(.*?)THEN(.*?)\n', re.IGNORECASE | re.DOTALL)
     steps = re.findall(sre, steps_txt)
+    caseversion = {}
+    caseversion['name'] = title.strip()
+    caseversion['description'] = desc.strip()
+    caseversion['steps'] = map(parseStep, enumerate(steps, start=1))
+    return json.loads(json.dumps(caseversion))
+    #return json.dumps(caseversion)
     # TODO: compose it as a valid moztrap json
     raise NotImplementedError
 

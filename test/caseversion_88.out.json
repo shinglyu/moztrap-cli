@@ -1,0 +1,16 @@
+{
+    "description": "Able to search test runs",
+    "name": "Able to search test runs",
+    "steps": [
+        {
+            "expected": "then Test run results display matching search results",
+            "instruction": "when Log in> Manage> Runs> Enter data in search field> click 'update the list'",
+            "number": 1
+        },
+        {
+            "expected": "then Test run results display matching search results",
+            "instruction": "when Enter search criteria for: status, product, testcycle, name, tester, environment, creator> click 'update the list'",
+            "number": 2
+        }
+    ]
+}

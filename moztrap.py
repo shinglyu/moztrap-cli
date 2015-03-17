@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-import clone
+import mtapi
 import diff
 
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +31,7 @@ def main():
 
     # print args
     if args.action == "clone":
-        clone.clone(args.resource_type, args.id)
+        mtapi.clone(args.resource_type, args.id)
     elif args.action == "diff":
         diff.diff(args)
     elif args.action == "push":

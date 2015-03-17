@@ -1,0 +1,113 @@
+{
+
+    "case": "/api/v1/case/88/",
+    "description": "Able to search test runs",
+    "environments": [
+        {
+            "elements": [
+                "/api/v1/element/5/",
+                "/api/v1/element/3/"
+            ],
+            "id": "1",
+            "profile": "/api/v1/profile/1/",
+            "resource_uri": "/api/v1/environment/1/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/5/",
+                "/api/v1/element/1/"
+            ],
+            "id": "3",
+            "profile": "/api/v1/profile/1/",
+            "resource_uri": "/api/v1/environment/3/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/6/",
+                "/api/v1/element/2/"
+            ],
+            "id": "8",
+            "profile": "/api/v1/profile/1/",
+            "resource_uri": "/api/v1/environment/8/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/1/",
+                "/api/v1/element/7/"
+            ],
+            "id": "13",
+            "profile": "/api/v1/profile/1/",
+            "resource_uri": "/api/v1/environment/13/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/1/",
+                "/api/v1/element/8/"
+            ],
+            "id": "14",
+            "profile": null,
+            "resource_uri": "/api/v1/environment/14/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/1/",
+                "/api/v1/element/9/"
+            ],
+            "id": "15",
+            "profile": "/api/v1/profile/1/",
+            "resource_uri": "/api/v1/environment/15/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/4/",
+                "/api/v1/element/8/"
+            ],
+            "id": "16",
+            "profile": null,
+            "resource_uri": "/api/v1/environment/16/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/3/",
+                "/api/v1/element/8/"
+            ],
+            "id": "17",
+            "profile": null,
+            "resource_uri": "/api/v1/environment/17/"
+        },
+        {
+            "elements": [
+                "/api/v1/element/2/",
+                "/api/v1/element/8/"
+            ],
+            "id": "18",
+            "profile": null,
+            "resource_uri": "/api/v1/environment/18/"
+        }
+    ],
+    "id": "88",
+    "name": "Able to search test runs",
+    "productversion": "/api/v1/productversion/1/",
+    "resource_uri": "/api/v1/caseversion/88/",
+    "status": "active",
+    "steps": [
+        {
+            "caseversion": "/api/v1/caseversion/88/",
+            "expected": "then Test run results display matching search results",
+            "id": "167",
+            "instruction": "when Log in> Manage> Runs> Enter data in search field> click 'update the list'",
+            "number": 1,
+            "resource_uri": "/api/v1/casestep/167/"
+        },
+        {
+            "caseversion": "/api/v1/caseversion/88/",
+            "expected": "then Test run results display matching search results",
+            "id": "168",
+            "instruction": "when Enter search criteria for: status, product, testcycle, name, tester, environment, creator> click 'update the list'",
+            "number": 2,
+            "resource_uri": "/api/v1/casestep/168/"
+        }
+    ],
+    "tags": [ ]
+
+}
