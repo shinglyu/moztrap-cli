@@ -67,7 +67,7 @@ def cloneByURL(url, dirname="./"):
 #Upload
 
 
-def push(filename):
+def push(filename, credental):
     with open(filename, 'r') as f:
         # Determine its type (caseversion? suite?)
         rtype, rid = orm.parseURL(f.readline())
@@ -75,16 +75,16 @@ def push(filename):
         if (rtype == 'caseversion'):
             caseversion = orm.parseCaseversion(''.join(f.readlines()))
             # Call forcePushCaseversion or forcePushSuite
-            forcePushCaseversion(rid, caseversion, requests)
+            forcePushCaseversion(rid, caseversion, requests, credental)
         elif (rtype == 'suite'):
             raise NotImplementedError
 
-def forcePushCaseversion(rid,  newcaseversion, requestlib):
+def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     # Make sure the number of steps equal
     oldcaseversion = downloadCaseversionById(rid)
     #print len(oldcaseversion['steps'])
     #print len(newcaseversion['steps'])
-    credental = {'username': 'admin-django', 'api_key': 'c67c9af7-7e07-4820-b686-5f92ae94f6c9' } # FIXME: hardcode
+    # credental = {'username': 'admin-django', 'api_key': 'c67c9af7-7e07-4820-b686-5f92ae94f6c9' } # FIXME: hardcode
     if len(oldcaseversion['steps']) != len(newcaseversion['steps']):
         raise Exception("You can't add or remove steps yet. The test case should have exact same number of steps as it remote one.")
 

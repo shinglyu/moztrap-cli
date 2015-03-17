@@ -26,6 +26,10 @@ def main():
     parser_push.add_argument('-f', '--force', action="store_true",
                              help="Force overwrite (BE CAREFUL!)")
     parser_push.add_argument('filename', type=str, help="File to be pushed")
+    parser_push.add_argument('-u', '--username',
+                             help="MozTrap username")
+    parser_push.add_argument('-k', '--api_key',
+                             help="MozTrap api key")
     args = parser.parse_args()
 
     # print args
@@ -37,7 +41,8 @@ def main():
         if not args.force:
             raise Exception("Push will force override everything on the server."
                              + " Use \"push -f\" to acknowledge the risk")
-        mtapi.push(args.filename)
+        credental = {'username': args.username, 'api_key': args.api_key}
+        mtapi.push(args.filename, credental)
 
 
 if __name__ == '__main__':
