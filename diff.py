@@ -2,9 +2,10 @@ import json
 import os
 import logging
 
+import config
 import mtapi
 
-difftool="vimdiff"
+difftool=config.difftool
 
 def diff(args):
     filename=args.filename
@@ -15,8 +16,8 @@ def diff(args):
 
     latestdir="./latest/"
     # TODO: maybe we can use orm.parseURL here and remove the cloneByURL method
-    mtapi.cloneByURL(meta[u'resource_uri'], latestdir)
+    latestFilename = mtapi.cloneByURL(meta[u'resource_uri'], latestdir)
 
-    os.system(difftool + " " + filename + " " + latestdir + filename)
+    os.system(difftool + " " + filename + " " + latestFilename)
     # call os.system('vimdiff')
 

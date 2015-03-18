@@ -5,14 +5,11 @@ import httplib
 import logging
 import requests
 
+import config
 import orm
 
-productversion="v2.2" #FIXME: hardcoded
-
-# mtorigin = "https://moztrap.mozilla.org"
-#mtorigin = "http://0.0.0.0:8080"
-mtorigin = "http://127.0.0.1:8000"
-# mtorigin = "http://requestb.in/1b8n1md1"
+productversion=config.productversion
+mtorigin = config.mtorigin
 
 # Download
 def downloadCaseversionById(cid):
@@ -24,10 +21,19 @@ def downloadCaseversionById(cid):
     data = urllib2.urlopen(url).read()
     return json.loads(data)
 
-
-def downloadSuiteById(sid):
+def downloadCaseversionByCaseId(cid):
     # query = query.replace(" ", "\%20")
     # baseurl = "https://developer.mozilla.org/en-US/search?format=json&q="
+    url = "{orig}/api/v1/caseversion/?format=json&case={cid}"\
+          "&productversion__version={pversion}".format(orig=mtorigin,
+                                                       cid=cid,
+                                                       pversion=productversion)
+    data = urllib2.urlopen(url).read()
+    parsed = json.loads(data)
+    return parsed['objects'][0]
+
+
+def downloadSuiteById(sid):
     url = (mtorigin + "/api/v1/caseversion/"
            "?case__suites={sid}&productversion__version={productversion}"
            "&limit=0&format=json"
@@ -50,6 +56,13 @@ def clone(resource_type, sid, dirname="./"):
         result = downloadSuiteById(query)
         output = orm.formatSuite(result, sid)
 
+    elif resource_type == "case":
+        query = str(sid)
+        logging.info("Downloading Case" + query + " ...")
+        logging.warning("Only the CaseVersion for {v} was downloaded".format(v=productversion))
+        result = downloadCaseversionByCaseId(query)
+        output = orm.formatCaseversion(result)
+
     filename = dirname + resource_type + "_" + str(sid) + ".txt"
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
@@ -57,16 +70,16 @@ def clone(resource_type, sid, dirname="./"):
             file_.write(output)
     logging.info(filename + " created")
 
+    return filename
+
 
 def cloneByURL(url, dirname="./"):
     (resource_type, rid) = orm.parseURL(url)
 
-    clone(resource_type, rid, dirname)
+    return clone(resource_type, rid, dirname)
 
 
 #Upload
-
-
 def push(filename, credental):
     with open(filename, 'r') as f:
         # Determine its type (caseversion? suite?)
@@ -82,22 +95,10 @@ def push(filename, credental):
 def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     # Make sure the number of steps equal
     oldcaseversion = downloadCaseversionById(rid)
-    #print len(oldcaseversion['steps'])
-    #print len(newcaseversion['steps'])
-    # credental = {'username': 'admin-django', 'api_key': 'c67c9af7-7e07-4820-b686-5f92ae94f6c9' } # FIXME: hardcode
     if len(oldcaseversion['steps']) != len(newcaseversion['steps']):
         raise Exception("You can't add or remove steps yet. The test case should have exact same number of steps as it remote one.")
 
-    puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                    origin=mtorigin, uri=oldcaseversion['resource_uri'],
-                    username=credental['username'],
-                    apikey=credental['api_key']
-                )
-    headers = {'Content-Type': 'application/json'}
-    r = requestlib.put(puturl, data=json.dumps(newcaseversion), headers=headers)
-    logging.info(r.status_code)
-    logging.debug(r.text)
-
+    # Update each steps
     for (oldstep, newstep)in zip(oldcaseversion['steps'], newcaseversion['steps']):
 
         rtype, rid = orm.parseURL(oldstep['resource_uri'])
@@ -109,7 +110,20 @@ def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
                      apikey=credental['api_key']
                  )
         headers = {'Content-Type': 'application/json'}
-        r = requestlib.put(puturl, data=json.dumps(newstep), headers=headers)
+        r = requestlib.put(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
         logging.info(r.status_code)
         logging.debug(r.text)
-    #TODO:  update description and title too
+
+    # Update case name and descriptions
+    puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
+                    origin=mtorigin, uri=oldcaseversion['resource_uri'],
+                    username=credental['username'],
+                    apikey=credental['api_key']
+                )
+    headers = {'Content-Type': 'application/json'}
+    logging.debug(puturl)
+    # FIXME: 504 timeout, don't know why
+    r = requestlib.put(puturl, data=json.dumps(newcaseversion), headers=headers, timeout=config.networktimeout)
+    logging.info(r.status_code)
+    logging.debug(r.text)
+
