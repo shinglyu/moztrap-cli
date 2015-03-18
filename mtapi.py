@@ -10,6 +10,7 @@ import orm
 
 productversion=config.productversion
 mtorigin = config.mtorigin
+headers = {'Content-Type': 'application/json'}
 
 # Download
 def downloadCaseversionById(cid):
@@ -95,24 +96,42 @@ def push(filename, credental):
 def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     # Make sure the number of steps equal
     oldcaseversion = downloadCaseversionById(rid)
-    if len(oldcaseversion['steps']) != len(newcaseversion['steps']):
-        raise Exception("You can't add or remove steps yet. The test case should have exact same number of steps as it remote one.")
+    if len(oldcaseversion['steps']) > len(newcaseversion['steps']):
+        raise Exception("You can't remove steps yet. The test case should have the same number or moreof steps as it remote one.")
 
     # Update each steps
-    for (oldstep, newstep)in zip(oldcaseversion['steps'], newcaseversion['steps']):
+    # map(None, ...) is a padding version of zip()
+    number = 1
+    for (oldstep, newstep) in map(None, oldcaseversion['steps'], newcaseversion['steps']):
 
-        rtype, rid = orm.parseURL(oldstep['resource_uri'])
-        logging.info("Updating " + rtype + " " + rid)
+        if oldstep is None:
+            #rtype, rid = orm.parseURL(oldstep['resource_uri'])
+            logging.info("Creating new step")
 
-        puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                     origin=mtorigin, uri=oldstep['resource_uri'],
-                     username=credental['username'],
-                     apikey=credental['api_key']
-                 )
-        headers = {'Content-Type': 'application/json'}
-        r = requestlib.put(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
-        logging.info(r.status_code)
-        logging.debug(r.text)
+            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
+                        origin=mtorigin, uri="/api/v1/casestep/",
+                        username=credental['username'],
+                        apikey=credental['api_key']
+                    )
+            logging.debug(puturl)
+            newstep['caseversion'] = oldcaseversion['resource_uri'] # TODO: move this to orm::parseCaseversion?
+            r = requestlib.post(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
+            logging.info(r.status_code)
+            logging.debug(r.text)
+
+        else:
+            rtype, rid = orm.parseURL(oldstep['resource_uri'])
+            logging.info("Updating " + rtype + " " + rid)
+
+            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
+                        origin=mtorigin, uri=oldstep['resource_uri'],
+                        username=credental['username'],
+                        apikey=credental['api_key']
+                    )
+            r = requestlib.put(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
+            logging.info(r.status_code)
+            logging.debug(r.text)
+        number += 1
 
     # Update case name and descriptions
     puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
@@ -120,7 +139,6 @@ def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
                     username=credental['username'],
                     apikey=credental['api_key']
                 )
-    headers = {'Content-Type': 'application/json'}
     logging.debug(puturl)
     # FIXME: 504 timeout, don't know why
     r = requestlib.put(puturl, data=json.dumps(newcaseversion), headers=headers, timeout=config.networktimeout)
