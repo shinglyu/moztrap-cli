@@ -5,7 +5,7 @@ import logging
 import mtapi
 import diff
 
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.DEBUG)
 
 

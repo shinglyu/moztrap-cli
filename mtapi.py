@@ -29,8 +29,10 @@ def downloadCaseversionByCaseId(cid):
           "&productversion__version={pversion}".format(orig=mtorigin,
                                                        cid=cid,
                                                        pversion=productversion)
+    logging.debug(url)
     data = urllib2.urlopen(url).read()
     parsed = json.loads(data)
+    logging.debug(parsed)
     return parsed['objects'][0]
 
 
@@ -59,7 +61,7 @@ def clone(resource_type, sid, dirname="./"):
 
     elif resource_type == "case":
         query = str(sid)
-        logging.info("Downloading Case" + query + " ...")
+        logging.info("Downloading Case " + query + " ...")
         logging.warning("Only the CaseVersion for {v} was downloaded".format(v=productversion))
         result = downloadCaseversionByCaseId(query)
         output = orm.formatCaseversion(result)
@@ -96,8 +98,8 @@ def push(filename, credental):
 def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     # Make sure the number of steps equal
     oldcaseversion = downloadCaseversionById(rid)
-    if len(oldcaseversion['steps']) > len(newcaseversion['steps']):
-        raise Exception("You can't remove steps yet. The test case should have the same number or moreof steps as it remote one.")
+    #if len(oldcaseversion['steps']) > len(newcaseversion['steps']):
+        #raise Exception("You can't remove steps yet. The test case should have the same number or moreof steps as it remote one.")
 
     # Update each steps
     # map(None, ...) is a padding version of zip()
@@ -119,12 +121,27 @@ def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
             logging.info(r.status_code)
             logging.debug(r.text)
 
+        elif newstep is None:
+            logging.info("Deleting old step")
+
+            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
+                        origin=mtorigin,
+                        uri=oldstep['resource_uri'],
+                        username=credental['username'],
+                        apikey=credental['api_key']
+                    )
+            logging.debug(puturl)
+            r = requestlib.delete(puturl, headers=headers, timeout=config.networktimeout)
+            logging.info(r.status_code)
+            logging.debug(r.text)
+
         else:
             rtype, rid = orm.parseURL(oldstep['resource_uri'])
             logging.info("Updating " + rtype + " " + rid)
 
             puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                        origin=mtorigin, uri=oldstep['resource_uri'],
+                        origin=mtorigin,
+                        uri=oldstep['resource_uri'],
                         username=credental['username'],
                         apikey=credental['api_key']
                     )
