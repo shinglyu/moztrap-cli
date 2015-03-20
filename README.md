@@ -37,5 +37,3 @@ __Warning: this will force override the remote version__
 #Known issue
 * The default product is hardcoded to `Firefox OS v2.2` right now
 * The default diff tool is hardcoded to `vimdiff` right now
-* Pushing a suite to MozTrap has not been implemented yet.
-
