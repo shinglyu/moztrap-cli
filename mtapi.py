@@ -41,6 +41,7 @@ def downloadSuiteById(sid):
            "?case__suites={sid}&productversion__version={productversion}"
            "&limit=0&format=json"
           ).format(sid=sid, productversion=productversion)
+    logging.debug(url)
     data = urllib2.urlopen(url).read()
     return json.loads(data)
 
@@ -86,13 +87,15 @@ def cloneByURL(url, dirname="./"):
 def push(filename, credental):
     with open(filename, 'r') as f:
         # Determine its type (caseversion? suite?)
-        rtype, rid = orm.parseURL(f.readline())
+        rtype, rid = orm.parseURL(f.readline()) # TODO: do we need to extract the first line here? or in parse*
 
         if (rtype == 'caseversion'):
             caseversion = orm.parseCaseversion(''.join(f.readlines()))
             # Call forcePushCaseversion or forcePushSuite
             forcePushCaseversion(rid, caseversion, requests, credental)
         elif (rtype == 'suite'):
+            suite = orm.parseSuite(''.join(f.readlines()))
+            forcePushSuite(rid, suite, requests, credental)
             raise NotImplementedError
 
 def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
@@ -162,3 +165,12 @@ def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     logging.info(r.status_code)
     logging.debug(r.text)
 
+def forcePushSuite(sid, newsuite, requestlib, credental):
+    oldsuite = downloadSuiteById(sid)
+    if len(oldsuite['objects']) != len(newsuite['objects']):
+        raise Exception("You can't add or remove cases from a suite yet. Remote version has {0} cases, local version has {1} cases".format(len(oldsuite['objects']), len(newsuite['objects'])))
+
+    # FIXME: potential ordering problem
+    for (oldcaseversion, newcaseversion) in map(None, oldsuite['objects'], newsuite['objects']):
+        rtype, rid = orm.parseURL(oldcaseversion['resource_uri'])
+        forcePushCaseversion(rid, newcaseversion, requestlib, credental)

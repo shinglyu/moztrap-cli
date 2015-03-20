@@ -1,0 +1,52 @@
+{
+    "objects": [
+        {
+            "description": "A user can log in to the app.",
+            "name": "Can log in. NEW",
+            "steps": [
+                {
+                    "expected": "See a form with username and password fields.",
+                    "instruction": "Click the login link in the upper right.",
+                    "number": 1
+                },
+                {
+                    "expected": "See a welcome message in the upper right.",
+                    "instruction": "Fill in a valid username and password, submit.",
+                    "number": 2
+                }
+            ]
+        },
+        {
+            "description": "A new user can register for the app.",
+            "name": "Can register.",
+            "steps": [
+                {
+                    "expected": "See a user registration form.",
+                    "instruction": "Click the register link in the upper right.",
+                    "number": 1
+                },
+                {
+                    "expected": "Receive a verification email.",
+                    "instruction": "Fill in all fields, submit.",
+                    "number": 2
+                }
+            ]
+        },
+        {
+            "description": "",
+            "name": "Hello World",
+            "steps": [
+                {
+                    "expected": "Console log says hello world",
+                    "instruction": "Say Hello World",
+                    "number": 1
+                },
+                {
+                    "expected": "",
+                    "instruction": "Done",
+                    "number": 2
+                }
+            ]
+        }
+    ]
+}

@@ -3,7 +3,7 @@ import logging
 # For mtapi.py
 
 productversion="v2.2" #FIXME: hardcoded
-# productversion="0.6" #For local debug
+# productversion="0.8" #For local debug
 
 mtorigin = "https://moztrap.mozilla.org" # production
 # mtorigin = "http://127.0.0.1:8000"     # local

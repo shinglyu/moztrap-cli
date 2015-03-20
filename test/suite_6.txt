@@ -1,0 +1,40 @@
+{ "resource_uri":"/api/v1/suite/6/" }
+{ "resource_uri":"/api/v1/caseversion/3/" }
+TEST THAT Can log in. NEW
+A user can log in to the app.
+
+WHEN Click the login link in the upper right.
+THEN See a form with username and password fields.
+
+WHEN Fill in a valid username and password, submit.
+THEN See a welcome message in the upper right.
+
+
+=====
+
+{ "resource_uri":"/api/v1/caseversion/5/" }
+TEST THAT Can register.
+A new user can register for the app.
+
+WHEN Click the register link in the upper right.
+THEN See a user registration form.
+
+WHEN Fill in all fields, submit.
+THEN Receive a verification email.
+
+
+=====
+
+{ "resource_uri":"/api/v1/caseversion/9/" }
+TEST THAT Hello World
+
+
+WHEN Say Hello World
+THEN Console log says hello world
+
+WHEN Done
+THEN 
+
+
+=====
+

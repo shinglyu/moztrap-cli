@@ -1,0 +1,1410 @@
+{
+    "meta": {
+        "limit": 0,
+        "offset": 0,
+        "total_count": 3
+    },
+    "objects": [
+        {
+            "case": "/api/v1/case/1/",
+            "created_by": {
+                "id": "4",
+                "resource_uri": "/api/v1/user/4/",
+                "username": "manager"
+            },
+            "description": "A user can log in to the app.",
+            "environments": [
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "1",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/1/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "2",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/2/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/7/"
+                    ],
+                    "id": "3",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/3/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "4",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/4/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "5",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/5/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "6",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/6/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "7",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/7/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "8",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/8/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "9",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/9/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "10",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/10/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "11",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/11/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "12",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/12/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "13",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/13/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "14",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/14/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "15",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/15/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/4/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "16",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/16/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "17",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/17/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/4/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "18",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/18/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "19",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/19/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "20",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/20/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "21",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/21/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "22",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/22/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/7/"
+                    ],
+                    "id": "23",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/23/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "24",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/24/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "25",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/25/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "26",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/26/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "27",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/27/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "28",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/28/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "29",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/29/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "30",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/30/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "31",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/31/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "32",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/32/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "33",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/33/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "34",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/34/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "35",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/35/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/7/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "36",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/36/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "37",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/37/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "38",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/38/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "39",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/39/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "40",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/40/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "41",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/41/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "42",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/42/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "43",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/43/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "44",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/44/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "45",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/45/"
+                }
+            ],
+            "id": "3",
+            "modified_by": null,
+            "modified_on": "2015-03-19T07:16:29",
+            "name": "Can log in. NEW",
+            "priority": "None",
+            "productversion": "/api/v1/productversion/5/",
+            "productversion_name": "MozTrap 0.8",
+            "resource_uri": "/api/v1/caseversion/3/",
+            "status": "active",
+            "steps": [
+                {
+                    "caseversion": "/api/v1/caseversion/3/",
+                    "expected": "See a form with username and password fields.",
+                    "id": "5",
+                    "instruction": "Click the login link in the upper right.",
+                    "number": 0,
+                    "resource_uri": "/api/v1/casestep/5/"
+                },
+                {
+                    "caseversion": "/api/v1/caseversion/3/",
+                    "expected": "See a welcome message in the upper right.",
+                    "id": "6",
+                    "instruction": "Fill in a valid username and password, submit.",
+                    "number": 1,
+                    "resource_uri": "/api/v1/casestep/6/"
+                }
+            ],
+            "tags": []
+        },
+        {
+            "case": "/api/v1/case/2/",
+            "created_by": {
+                "id": "3",
+                "resource_uri": "/api/v1/user/3/",
+                "username": "creator"
+            },
+            "description": "A new user can register for the app.",
+            "environments": [
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "4",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/4/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "5",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/5/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "6",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/6/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "7",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/7/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "8",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/8/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "9",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/9/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "10",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/10/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "11",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/11/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "12",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/12/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "13",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/13/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "14",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/14/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "15",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/15/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "17",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/17/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/4/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "18",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/18/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "19",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/19/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "20",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/20/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "24",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/24/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "25",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/25/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "26",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/26/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "27",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/27/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "28",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/28/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "29",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/29/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "30",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/30/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "31",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/31/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "32",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/32/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "33",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/33/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "34",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/34/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "35",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/35/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "38",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/38/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "39",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/39/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "40",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/40/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "41",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/41/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "42",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/42/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "43",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/43/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "44",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/44/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "45",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/45/"
+                }
+            ],
+            "id": "5",
+            "modified_by": {
+                "id": "3",
+                "resource_uri": "/api/v1/user/3/",
+                "username": "creator"
+            },
+            "modified_on": "2012-04-02T19:16:30",
+            "name": "Can register.",
+            "priority": "None",
+            "productversion": "/api/v1/productversion/5/",
+            "productversion_name": "MozTrap 0.8",
+            "resource_uri": "/api/v1/caseversion/5/",
+            "status": "active",
+            "steps": [
+                {
+                    "caseversion": "/api/v1/caseversion/5/",
+                    "expected": "See a user registration form.",
+                    "id": "9",
+                    "instruction": "Click the register link in the upper right.",
+                    "number": 1,
+                    "resource_uri": "/api/v1/casestep/9/"
+                },
+                {
+                    "caseversion": "/api/v1/caseversion/5/",
+                    "expected": "Receive a verification email.",
+                    "id": "10",
+                    "instruction": "Fill in all fields, submit.",
+                    "number": 2,
+                    "resource_uri": "/api/v1/casestep/10/"
+                }
+            ],
+            "tags": [
+                {
+                    "description": "",
+                    "id": "1",
+                    "name": "registration",
+                    "product": "/api/v1/product/2/",
+                    "resource_uri": "/api/v1/tag/1/"
+                }
+            ]
+        },
+        {
+            "case": "/api/v1/case/4/",
+            "created_by": {
+                "id": "1",
+                "resource_uri": "/api/v1/user/1/",
+                "username": "admin-django"
+            },
+            "description": "",
+            "environments": [
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "1",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/1/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "2",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/2/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/7/"
+                    ],
+                    "id": "3",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/3/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "4",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/4/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "5",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/5/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "6",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/6/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "7",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/7/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "8",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/8/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "9",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/9/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "10",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/10/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "11",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/11/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "12",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/12/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "13",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/13/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "14",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/14/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/3/",
+                        "/api/v1/element/5/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "15",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/15/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/4/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "16",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/16/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "17",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/17/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/4/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "18",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/18/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "19",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/19/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/4/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "20",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/20/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "21",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/21/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "22",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/22/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/7/"
+                    ],
+                    "id": "23",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/23/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "24",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/24/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "25",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/25/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/9/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "26",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/26/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "27",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/27/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "28",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/28/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "29",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/29/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "30",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/30/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "31",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/31/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/1/",
+                        "/api/v1/element/8/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "32",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/32/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "33",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/33/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/12/"
+                    ],
+                    "id": "34",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/34/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/1/",
+                        "/api/v1/element/11/"
+                    ],
+                    "id": "35",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/35/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/7/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "36",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/36/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/7/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "37",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/37/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "38",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/38/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/9/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "39",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/39/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "40",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/40/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/6/"
+                    ],
+                    "id": "41",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/41/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "42",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/42/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/8/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "43",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/43/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/2/",
+                        "/api/v1/element/10/"
+                    ],
+                    "id": "44",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/44/"
+                },
+                {
+                    "elements": [
+                        "/api/v1/element/5/",
+                        "/api/v1/element/12/",
+                        "/api/v1/element/2/"
+                    ],
+                    "id": "45",
+                    "profile": "/api/v1/profile/1/",
+                    "resource_uri": "/api/v1/environment/45/"
+                }
+            ],
+            "id": "9",
+            "modified_by": {
+                "id": "1",
+                "resource_uri": "/api/v1/user/1/",
+                "username": "admin-django"
+            },
+            "modified_on": "2014-10-28T10:06:22",
+            "name": "Hello World",
+            "priority": "1",
+            "productversion": "/api/v1/productversion/5/",
+            "productversion_name": "MozTrap 0.8",
+            "resource_uri": "/api/v1/caseversion/9/",
+            "status": "active",
+            "steps": [
+                {
+                    "caseversion": "/api/v1/caseversion/9/",
+                    "expected": "Console log says hello world",
+                    "id": "13",
+                    "instruction": "Say Hello World",
+                    "number": 1,
+                    "resource_uri": "/api/v1/casestep/13/"
+                },
+                {
+                    "caseversion": "/api/v1/caseversion/9/",
+                    "expected": "",
+                    "id": "14",
+                    "instruction": "Done",
+                    "number": 2,
+                    "resource_uri": "/api/v1/casestep/14/"
+                }
+            ],
+            "tags": [
+                {
+                    "description": "",
+                    "id": "3",
+                    "name": "test",
+                    "product": "/api/v1/product/2/",
+                    "resource_uri": "/api/v1/tag/3/"
+                }
+            ]
+        }
+    ]
+}

@@ -53,6 +53,21 @@ def formatSuite(suite, sid):
     return txt
 
 
+def parseSuite(suite_txt):
+    # plaintext => json obj
+    # Get the first line, the suite uri
+    # suite_uri, caseversions_txt = suite_txt.strip().split('\n', 1)
+
+    caseversions = map(lambda x: parseCaseversion(x),
+                       suite_txt.strip().rstrip('=====').split('====='))
+
+    suite = {}
+    suite['objects'] = caseversions
+    return json.loads(json.dumps(suite))
+    #return json.dumps(caseversion)
+    # TODO: compose it as a valid moztrap json
+
+
 def parseURL(url):
     import re
     p = re.compile(ur'\/api\/v1\/(.*)\/(.*)\/')

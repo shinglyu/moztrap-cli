@@ -39,9 +39,9 @@ def main():
     elif args.action == "diff":
         diff.diff(args)
     elif args.action == "push":
-        if not args.force:
-            raise Exception("Push will force override everything on the server."
-                             + " Use \"push -f\" to acknowledge the risk")
+        #if not args.force:
+        #    raise Exception("Push will force override everything on the server."
+        #                     + " Use \"push -f\" to acknowledge the risk")
         credental = {'username': args.username, 'api_key': args.api_key}
         mtapi.push(args.filename, credental)
 
