@@ -4,6 +4,7 @@ import os
 import httplib
 import logging
 import requests
+import copy
 
 import config
 import orm
@@ -37,8 +38,9 @@ def downloadCaseversionByCaseId(cid):
 
 
 def downloadSuiteById(sid):
+    # TODO: move "Downloading..." to here
     url = (mtorigin + "/api/v1/caseversion/"
-           "?case__suites={sid}&productversion__version={productversion}"
+           "?case__suites={sid}"
            "&limit=0&format=json"
           ).format(sid=sid, productversion=productversion)
     logging.debug(url)
@@ -96,7 +98,6 @@ def push(filename, credental):
         elif (rtype == 'suite'):
             suite = orm.parseSuite(''.join(f.readlines()))
             forcePushSuite(rid, suite, requests, credental)
-            raise NotImplementedError
 
 def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
     # Make sure the number of steps equal
@@ -170,7 +171,15 @@ def forcePushSuite(sid, newsuite, requestlib, credental):
     if len(oldsuite['objects']) != len(newsuite['objects']):
         raise Exception("You can't add or remove cases from a suite yet. Remote version has {0} cases, local version has {1} cases".format(len(oldsuite['objects']), len(newsuite['objects'])))
 
-    # FIXME: potential ordering problem
-    for (oldcaseversion, newcaseversion) in map(None, oldsuite['objects'], newsuite['objects']):
+    # FIXME: potential ordering problem, text is sorted by id
+    for (oldcaseversion, newcaseversion) in map(None,
+                                                sorted(oldsuite['objects'], key=lambda x: x['id']),
+                                                newsuite['objects']):
         rtype, rid = orm.parseURL(oldcaseversion['resource_uri'])
-        forcePushCaseversion(rid, newcaseversion, requestlib, credental)
+        #print(newcaseversion['name'])
+        oldcaseversionCmp = copy.deepcopy(oldcaseversion)
+        oldcaseversionCmp.pop('resource_uri', None) #FIXME: don't do this after resource_uri is parsed
+        if(orm.formatCaseversion(oldcaseversionCmp) == orm.formatCaseversion(newcaseversion)):
+            logging.info("No change for caseversion {0}, skipping".format(oldcaseversion['id']))
+        else:
+            forcePushCaseversion(rid, newcaseversion, requestlib, credental)
