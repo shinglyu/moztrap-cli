@@ -34,6 +34,13 @@ python moztrap.py push --force -u <username> -k <api_key> case_<case_id>.txt
 
 __Warning: this will force override the remote version__
 
+#Configuration
+Edit the `config.py` file to change:
+* Default product version
+* Diff tool
+* etc.
+
+
 #Known issue
 * The default product is hardcoded to `Firefox OS v2.2` right now
 * The default diff tool is hardcoded to `vimdiff` right now
