@@ -78,7 +78,6 @@ class MozTrapTestCase(object):
     def _create_test_steps(self, case_version_uri):
         base_url = mtorigin + namespace_api_case_step
         for step in self.steps:
-            self.step_current_no += 1
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
