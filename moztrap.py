@@ -31,6 +31,15 @@ def main():
                              help="MozTrap username", required=True)
     parser_push.add_argument('-k', '--api_key',
                              help="MozTrap api key", required=True)
+
+    parser_push = subparsers.add_parser('create')
+    # parser_push.add_argument('-f', '--force', action="store_true",
+    #                          help="Force overwrite (BE CAREFUL!)", required=True)
+    parser_push.add_argument('filename', type=str, help="File to be created")
+    parser_push.add_argument('-u', '--username',
+                             help="MozTrap username", required=True)
+    parser_push.add_argument('-k', '--api_key',
+                             help="MozTrap api key", required=True)
     args = parser.parse_args()
 
     # print args
@@ -44,6 +53,13 @@ def main():
         #                     + " Use \"push -f\" to acknowledge the risk")
         credental = {'username': args.username, 'api_key': args.api_key}
         mtapi.push(args.filename, credental)
+
+    elif args.action == "create":
+        #if not args.force:
+        #    raise Exception("Push will force override everything on the server."
+        #                     + " Use \"push -f\" to acknowledge the risk")
+        credental = {'username': args.username, 'api_key': args.api_key}
+        mtapi.create(args.filename, credental)
 
 
 if __name__ == '__main__':

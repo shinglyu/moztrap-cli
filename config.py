@@ -15,6 +15,10 @@ networktimeout = 15 #sec
 # For diff.py
 difftool="vimdiff"
 
+#For create
+defaultProduct = "Firefox OS"
+defaultVersion = productversion
+
 # Global logging setting
 logging.basicConfig(level=logging.INFO)
 # logging.basicConfig(level=logging.DEBUG)

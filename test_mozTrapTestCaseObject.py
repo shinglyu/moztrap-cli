@@ -5,9 +5,11 @@ import unittest
 import mtapi #SUT
 import orm
 
-mz_user_name = "root"
-mz_user_api_key = "10dc62fc-39a2-4e67-be5f-b4403163dc07"
+# mz_user_name = "root"
+# mz_user_api_key = "10dc62fc-39a2-4e67-be5f-b4403163dc07"
 
+mz_user_name = "admin-django"
+mz_user_api_key = "c67c9af7-7e07-4820-b686-5f92ae94f6c9"
 
 class TestMTApi(unittest.TestCase):
     def setUp(self):
@@ -48,10 +50,13 @@ class TestMTApi(unittest.TestCase):
 
         sample_json = orm.parseSuite(self.test_case_sample)
         for case in sample_json['objects']:
+            print case['name']
             print case['steps']
             print case['description']
-            test_case_obj = mtapi.MozTrapTestCase(case['name'], "testProduct", "1.0")
+            # test_case_obj = mtapi.MozTrapTestCase(case['name'], "testProduct", "1.0")
+            test_case_obj = mtapi.MozTrapTestCase(case['name'], "MozTrap", "0.8")
             for step in case['steps']:
+                print step
                 test_case_obj.add_step(step['instruction'], step['expected'])
             # tag is not working when calling moztrap's REST API!!!
             test_case_obj.add_tag("testTag", "testDesc")

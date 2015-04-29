@@ -67,10 +67,13 @@ class MozTrapTestCase(object):
     tags = []
     step_current_no = 0
 
-    def __init__(self, name, product_name, product_version, steps=[], id_prefix=mz_case_id_prefix):
+    def __init__(self, name, product_name, product_version, steps=None, id_prefix=mz_case_id_prefix):
         self.name = name
         self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
-        self.steps = steps
+        if (steps == None): #http://stackoverflow.com/questions/1132941/least-astonishment-in-python-the-mutable-default-argument
+            self.steps = []
+        else:
+            self.steps = steps
         self.id_prefix = id_prefix
         if user_params is None:
             logging.error("Please set user params before init the MozTrapTest case!!!")
@@ -304,3 +307,19 @@ def forcePushSuite(sid, newsuite, requestlib, credental):
             logging.info("No change for caseversion {0}, skipping".format(oldcaseversion['id']))
         else:
             forcePushCaseversion(rid, newcaseversion, requestlib, credental)
+
+def create(filename, credental):
+    set_user_params(credental['username'], credental['api_key']); #TODO
+    with open(filename, 'r') as f:
+        # Determine its type (caseversion? suite?)
+        #sample_json = orm.parseSuite(self.test_case_sample)
+        newcases = orm.parseSuite(''.join(f.readlines()))
+        for case in newcases['objects']:
+            # TODO: read product from test case namespace id
+            # FIXME:  HRADCODE                                  v---------------
+            test_case_obj = MozTrapTestCase(case['name'], config.defaultProduct, config.defaultVersion)
+            for step in case['steps']:
+                test_case_obj.add_step(step['instruction'], step['expected'])
+            # tag is not working when calling moztrap's REST API!!!
+            # test_case_obj.add_tag("testTag", "testDesc")
+            test_case_obj.create()
