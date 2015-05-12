@@ -1,7 +1,6 @@
 import urllib2
 import json
 import os
-import httplib
 import logging
 import requests
 import copy
@@ -59,24 +58,32 @@ def get_product_uri(name, version):
 
 class MozTrapTestCase(object):
     name = None
+    product_name = None
     product_uri = None
+    product_version = None
     product_version_uri = None
     description = None
     id_prefix = None
+    status = None
     steps = []
     tags = []
     step_current_no = 0
+    case_version_objs = None
+    case_version_id = None
 
-    def __init__(self, name, product_name, product_version, steps=None, id_prefix=mz_case_id_prefix):
-        self.name = name
+    def __init__(self, name, product_name, product_version, case_version_id=None,
+                 status="active", description=None, steps=None, id_prefix=mz_case_id_prefix):
+        self.name, self.description, self.status, self.case_version_id = name, description, status, case_version_id
+        self.product_name, self.product_version = product_name, product_version
         self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
-        if (steps == None): #http://stackoverflow.com/questions/1132941/least-astonishment-in-python-the-mutable-default-argument
+        if (steps is None): #http://stackoverflow.com/questions/1132941/least-astonishment-in-python-the-mutable-default-argument
             self.steps = []
         else:
             self.steps = steps
         self.id_prefix = id_prefix
         if user_params is None:
             logging.error("Please set user params before init the MozTrapTest case!!!")
+        self.case_version_objs = self._get_case_version_objs()
 
     def _create_test_steps(self, case_version_uri):
         base_url = mtorigin + namespace_api_case_step
@@ -84,6 +91,8 @@ class MozTrapTestCase(object):
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
+            step['resource_uri'] = resp.json()['resource_uri']
+            step['caseversion'] = resp.json()['caseversion']
             _check_respone_code(resp)
         return resp
 
@@ -96,7 +105,7 @@ class MozTrapTestCase(object):
 
     def _create_test_case_version(self, case_uri):
         test_data = {"productversion": self.product_version_uri, "case": case_uri, "name": self.name,
-                     "description": self.description, "status": "active", "tags": self.tags}
+                     "description": self.description, "status": self.status, "tags": self.tags}
         base_url = mtorigin + namespace_api_case_version
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
@@ -115,6 +124,26 @@ class MozTrapTestCase(object):
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
+
+    def existing_in_moztrap(self):
+        if len(self.case_version_objs) > 0:
+            return True
+        else:
+            return False
+
+    def clean_steps(self):
+        self.steps = []
+        self.step_current_no = 0
+
+    def update_step(self, instruction, expected, number):
+        update_success = False
+        for step in self.steps:
+            if step['number'] == number:
+                step['instruction'] = instruction
+                step['expected'] = expected
+                update_success = True
+        if update_success is False:
+            logging.error("can't find the step number in current steps: " + str(self.steps))
 
     def add_step(self, instruction, expected, number=0):
         if number == 0:
@@ -136,6 +165,68 @@ class MozTrapTestCase(object):
         case_version_uri_resp = self._create_test_case_version(case_uri).json()
         case_version_uri = case_version_uri_resp['resource_uri']
         self._create_test_steps(case_version_uri)
+        return case_version_uri_resp
+
+    def _get_case_version_objs(self):
+        return_objs = None
+        if self.case_version_id is None:
+            query_params = {"name": self.name, "productversion__product__name": self.product_name,
+                            "productversion__version": self.product_version, "format": data_format}
+            base_url = mtorigin + namespace_api_case_version
+        else:
+            query_params = {"format": data_format}
+            base_url = mtorigin + namespace_api_case_version + str(self.case_version_id) + "/"
+
+        resp = requests.get(base_url, params=query_params, headers=headers)
+
+
+
+        if self.case_version_id is None:
+            _check_respone_code(resp)
+            return_objs = resp.json()['objects']
+        else:
+            if resp.status_code == 404:
+                logging.error("can't find the test case version with specify id: " + str(self.case_version_id))
+                return_objs = []
+            else:
+                return_objs = [resp.json()]
+        return return_objs
+
+    def _clean_old_steps(self, case_steps):
+        for step in case_steps:
+            base_url = mtorigin + step['resource_uri']
+            params = copy.deepcopy(user_params)
+            params['permanent'] = True
+            resp = requests.delete(base_url, params=params)
+            _check_respone_code(resp)
+
+    def _update_case_steps(self, case_version_uri, case_steps):
+        self._clean_old_steps(case_steps)
+        self._create_test_steps(case_version_uri)
+
+    def _update_case_version(self, case_version_uri, new_case_version_info):
+        base_url = mtorigin + case_version_uri
+        resp = requests.put(base_url, params=user_params, data=json.dumps(new_case_version_info), headers=headers)
+        _check_respone_code(resp)
+        for key_name in ["name", "description", "status", "tags", "steps"]:
+            if key_name in new_case_version_info.keys():
+                self.__dict__.__setitem__(key_name, new_case_version_info[key_name])
+        return resp
+
+    def update(self, new_case_version_info=None):
+        if len(self.case_version_objs) == 1:
+            case_version_uri = self.case_version_objs[0]['resource_uri']
+            case_steps = self.case_version_objs[0]['steps']
+            self._update_case_steps(case_version_uri, case_steps)
+            if new_case_version_info:
+                self._update_case_version(case_version_uri, new_case_version_info)
+        elif len(self.case_version_objs) == 0:
+            logging.error("Can't find any case fulfill the attributes (%s,%s,%s)" % (self.name, self.product_name, self.product_version))
+        else:
+            for case_version_obj in self.case_version_objs:
+                logging.error("Duplicate case name exist in system, can't do the update! case version uri: " + case_version_obj['productversion'])
+
+
 
 # Download
 def downloadCaseversionById(cid):
@@ -160,7 +251,6 @@ def downloadCaseversionByCaseId(cid):
     logging.debug(parsed)
     return parsed['objects'][0]
 
-
 def downloadSuiteById(sid):
     # TODO: move "Downloading..." to here
     url = (mtorigin + "/api/v1/caseversion/"
@@ -170,7 +260,6 @@ def downloadSuiteById(sid):
     logging.debug(url)
     data = urllib2.urlopen(url).read()
     return json.loads(data)
-
 
 def clone(resource_type, sid, dirname="./"):
     output = ""
@@ -202,12 +291,10 @@ def clone(resource_type, sid, dirname="./"):
 
     return filename
 
-
 def cloneByURL(url, dirname="./"):
     (resource_type, rid) = orm.parseURL(url)
 
     return clone(resource_type, rid, dirname)
-
 
 #Upload
 def push(filename, credental):
@@ -223,72 +310,18 @@ def push(filename, credental):
             suite = orm.parseSuite(''.join(f.readlines()))
             forcePushSuite(rid, suite, requests, credental)
 
-def forcePushCaseversion(rid,  newcaseversion, requestlib, credental):
-    # Make sure the number of steps equal
-    oldcaseversion = downloadCaseversionById(rid)
-    #if len(oldcaseversion['steps']) > len(newcaseversion['steps']):
-        #raise Exception("You can't remove steps yet. The test case should have the same number or moreof steps as it remote one.")
-
-    # Update each steps
-    # map(None, ...) is a padding version of zip()
-    number = 1
-    for (oldstep, newstep) in map(None, oldcaseversion['steps'], newcaseversion['steps']):
-
-        if oldstep is None:
-            #rtype, rid = orm.parseURL(oldstep['resource_uri'])
-            logging.info("Creating new step")
-
-            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                        origin=mtorigin, uri="/api/v1/casestep/",
-                        username=credental['username'],
-                        apikey=credental['api_key']
-                    )
-            logging.debug(puturl)
-            newstep['caseversion'] = oldcaseversion['resource_uri'] # TODO: move this to orm::parseCaseversion?
-            r = requestlib.post(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
-            logging.info(r.status_code)
-            logging.debug(r.text)
-
-        elif newstep is None:
-            logging.info("Deleting old step")
-
-            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                        origin=mtorigin,
-                        uri=oldstep['resource_uri'],
-                        username=credental['username'],
-                        apikey=credental['api_key']
-                    )
-            logging.debug(puturl)
-            r = requestlib.delete(puturl, headers=headers, timeout=config.networktimeout)
-            logging.info(r.status_code)
-            logging.debug(r.text)
-
-        else:
-            rtype, rid = orm.parseURL(oldstep['resource_uri'])
-            logging.info("Updating " + rtype + " " + rid)
-
-            puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                        origin=mtorigin,
-                        uri=oldstep['resource_uri'],
-                        username=credental['username'],
-                        apikey=credental['api_key']
-                    )
-            r = requestlib.put(puturl, data=json.dumps(newstep), headers=headers, timeout=config.networktimeout)
-            logging.info(r.status_code)
-            logging.debug(r.text)
-        number += 1
-
-    # Update case name and descriptions
-    puturl = "{origin}{uri}?username={username}&api_key={apikey}".format(
-                    origin=mtorigin, uri=oldcaseversion['resource_uri'],
-                    username=credental['username'],
-                    apikey=credental['api_key']
-                )
-    logging.debug(puturl)
-    # FIXME: 504 timeout, don't know why
-    r = requestlib.put(puturl, data=json.dumps(newcaseversion), headers=headers, timeout=config.networktimeout)
-    logging.info(r.status_code)
-    logging.debug(r.text)
+def forcePushCaseversion(newcaseversion, credential, case_version_id=None, product_info=None):
+    set_user_params(credential['username'], credential['api_key'])
+    if product_info is None:
+        product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
+    test_case_obj = MozTrapTestCase(newcaseversion['name'], product_info['name'], product_info['version'],
+                                    case_version_id=case_version_id)
+    for step in newcaseversion['steps']:
+        test_case_obj.add_step(step['instruction'], step['expected'])
+    if test_case_obj.existing_in_moztrap():
+        test_case_obj.update(newcaseversion)
+    else:
+        logging.error("Can't find test case on moztrap!")
 
 def forcePushSuite(sid, newsuite, requestlib, credental):
     oldsuite = downloadSuiteById(sid)
@@ -308,18 +341,21 @@ def forcePushSuite(sid, newsuite, requestlib, credental):
         else:
             forcePushCaseversion(rid, newcaseversion, requestlib, credental)
 
-def create(filename, credental):
-    set_user_params(credental['username'], credental['api_key']); #TODO
+
+def convert_mark_file_into_moztrap(filename, credential, product_info=None):
+    set_user_params(credential['username'], credential['api_key']) #TODO
+    if product_info is None:
+        # TODO: read product from test case namespace id
+        product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
     with open(filename, 'r') as f:
         # Determine its type (caseversion? suite?)
-        #sample_json = orm.parseSuite(self.test_case_sample)
-        newcases = orm.parseSuite(''.join(f.readlines()))
-        for case in newcases['objects']:
-            # TODO: read product from test case namespace id
+        cases = orm.parseSuite(''.join(f.readlines()))
+        for case in cases['objects']:
             # FIXME:  HRADCODE                                  v---------------
-            test_case_obj = MozTrapTestCase(case['name'], config.defaultProduct, config.defaultVersion)
+            test_case_obj = MozTrapTestCase(case['name'], product_info['name'], product_info['version'])
             for step in case['steps']:
                 test_case_obj.add_step(step['instruction'], step['expected'])
-            # tag is not working when calling moztrap's REST API!!!
-            # test_case_obj.add_tag("testTag", "testDesc")
-            test_case_obj.create()
+            if test_case_obj.existing_in_moztrap():
+                test_case_obj.update()
+            else:
+                test_case_obj.create()
