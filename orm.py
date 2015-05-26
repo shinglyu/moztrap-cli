@@ -46,9 +46,10 @@ def parseCaseversion(caseversion_txt):
     caseversion['name'] = title.strip()
     caseversion['description'] = desc.strip()
     caseversion['steps'] = map(parseStep, enumerate(steps, start=1))
-    logging.info("hi")
+    #logging.info("hi")
     #return json.dumps(caseversion)
     # TODO: compose it as a valid moztrap json
+    return caseversion
 
 
 def formatSuite(suite, sid):
