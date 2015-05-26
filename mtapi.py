@@ -33,7 +33,7 @@ def set_user_params(uname, akey, format=None):
 
 def _check_respone_code(check_response):
     if check_response.status_code not in [200, 201]:
-        logging.error("Send the request to url: %s" % str(check_response.url))
+        #logging.error("Send the request to url: %s" % str(check_response.url))
         logging.error("Got the return code: %s, the response is: %s" % (str(check_response.status_code), str(check_response.text)))
         return False
     return True
@@ -245,10 +245,10 @@ def downloadCaseversionByCaseId(cid):
           "&productversion__version={pversion}".format(orig=mtorigin,
                                                        cid=cid,
                                                        pversion=productversion)
-    logging.debug(url)
+    #logging.debug(url)
     data = urllib2.urlopen(url).read()
     parsed = json.loads(data)
-    logging.debug(parsed)
+    #logging.debug(parsed)
     return parsed['objects'][0]
 
 def downloadSuiteById(sid):
@@ -257,7 +257,7 @@ def downloadSuiteById(sid):
            "?case__suites={sid}"
            "&limit=0&format=json"
           ).format(sid=sid, productversion=productversion)
-    logging.debug(url)
+    #logging.debug(url)
     data = urllib2.urlopen(url).read()
     return json.loads(data)
 
@@ -333,7 +333,7 @@ def forcePushSuite(sid, newsuite, requestlib, credental):
                                                 sorted(oldsuite['objects'], key=lambda x: x['id']),
                                                 newsuite['objects']):
         rtype, rid = orm.parseURL(oldcaseversion['resource_uri'])
-        #print(newcaseversion['name'])
+        ##print(newcaseversion['name'])
         oldcaseversionCmp = copy.deepcopy(oldcaseversion)
         oldcaseversionCmp.pop('resource_uri', None) #FIXME: don't do this after resource_uri is parsed
         if(orm.formatCaseversion(oldcaseversionCmp) == orm.formatCaseversion(newcaseversion)):

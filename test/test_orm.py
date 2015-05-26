@@ -27,6 +27,7 @@ class TestOrmCaseversion(unittest.TestCase):
         in_txt = self.txt.split('\n',1)[1] # Remove first line
         caseversion_out = json.loads(self.json_out)
         self.assertEqual(type(orm.parseCaseversion(in_txt)), type(caseversion_out))
+        self.assertEqual(orm.parseCaseversion(in_txt)['resource_uri'], caseversion_out['resource_uri'])
         self.assertEqual(orm.parseCaseversion(in_txt)['name'], caseversion_out['name'])
         self.assertEqual(orm.parseCaseversion(in_txt)['description'], caseversion_out['description'])
         self.assertEqual(orm.parseCaseversion(in_txt), caseversion_out)

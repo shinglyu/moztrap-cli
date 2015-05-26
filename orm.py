@@ -5,6 +5,7 @@ import logging
 def formatCaseversion(caseversion):
     # Downloaded json obj => plaintext
     # FIXME: remove this try catch when resource uri is parsed
+    #print(caseversion)
     try:
         txt = "{{ \"resource_uri\":\"{uri}\" }}\n".format(uri=caseversion[u'resource_uri'])
     except KeyError:
@@ -45,7 +46,7 @@ def parseCaseversion(caseversion_txt):
     caseversion['name'] = title.strip()
     caseversion['description'] = desc.strip()
     caseversion['steps'] = map(parseStep, enumerate(steps, start=1))
-    return json.loads(json.dumps(caseversion))
+    logging.info("hi")
     #return json.dumps(caseversion)
     # TODO: compose it as a valid moztrap json
 

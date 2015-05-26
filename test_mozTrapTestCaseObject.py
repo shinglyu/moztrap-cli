@@ -72,13 +72,13 @@ class TestMTApi(unittest.TestCase):
     def test_mtapi_create(self):
         sample_json = orm.parseSuite(self.test_case_sample)
         for case in sample_json['objects']:
-            print case['name']
-            print case['steps']
-            print case['description']
+            #print case['name']
+            #print case['steps']
+            #print case['description']
             # test_case_obj = mtapi.MozTrapTestCase(case['name'], "testProduct", "1.0")
             test_case_obj = mtapi.MozTrapTestCase(case['name'], "MozTrap", "0.8")
             for step in case['steps']:
-                print step
+                #print step
                 test_case_obj.add_step(step['instruction'], step['expected'])
             # tag is not working when calling moztrap's REST API!!!
             test_case_obj.add_tag("testTag", "testDesc")

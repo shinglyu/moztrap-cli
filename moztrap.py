@@ -42,7 +42,7 @@ def main():
                              help="MozTrap api key", required=True)
     args = parser.parse_args()
 
-    # print args
+    # #print args
     if args.action == "clone":
         mtapi.clone(args.resource_type, args.id)
     elif args.action == "diff":
