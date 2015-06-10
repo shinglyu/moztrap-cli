@@ -229,8 +229,7 @@ class MozTrapTestCase(object):
 
 
 # Download
-def downloadCaseversionById(cid):
-    # query = query.replace(" ", "\%20")
+def downloadCaseversionById(cid): # query = query.replace(" ", "\%20")
     # baseurl = "https://developer.mozilla.org/en-US/search?format=json&q="
     baseURL = mtorigin + "/api/v1/caseversion/"
     url = baseURL + str(cid) + "/"
@@ -359,3 +358,24 @@ def convert_mark_file_into_moztrap(filename, credential, product_info=None):
                 test_case_obj.update()
             else:
                 test_case_obj.create()
+
+def load_json_into_moztrap(filename, credential, product_info=None):
+    set_user_params(credential['username'], credential['api_key']) #TODO
+    if product_info is None:
+        # TODO: read product from test case namespace id
+        product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
+    with open(filename, 'r') as f:
+        # Determine its type (caseversion? suite?)
+        suites = json.load(f)
+        #cases = orm.parseSuite(''.join(f.readlines()))
+        for case in suites[0]['testcases']:
+            # FIXME:  HRADCODE                                  v---------------
+            test_case_obj = MozTrapTestCase(case['id'], product_info['name'], product_info['version'])
+            #for step in case['steps']:
+            #    test_case_obj.add_step(step['instruction'], step['expected'])
+            test_case_obj.add_step(case['instructions'], "")
+            if test_case_obj.existing_in_moztrap():
+                test_case_obj.update()
+            else:
+                test_case_obj.create()
+
