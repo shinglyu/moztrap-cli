@@ -14,6 +14,8 @@ mtorigin = config.mtorigin
 namespace_api_base = "/api/v1"
 namespace_api_product = namespace_api_base + "/product/"
 namespace_api_case = namespace_api_base + "/case/"
+namespace_api_suitecase = namespace_api_base + "/suitecase/"
+namespace_api_suite = namespace_api_base + "/suite/"
 namespace_api_case_version = namespace_api_base + "/caseversion/"
 namespace_api_case_step = namespace_api_base + "/casestep/"
 namespace_api_tag = namespace_api_base + "/tag/"
@@ -45,7 +47,7 @@ def get_product_uri(name, version):
         base_url = mtorigin + namespace_api_product
         resp = requests.get(base_url, params=params)
         if _check_respone_code(resp):
-            product_obj_json = resp.json()['objects'][0]
+            product_obj_json = resp.json['objects'][0]
             product_uri = product_obj_json['resource_uri']
             for product_version in product_obj_json['productversions']:
                 if product_version['version'] == unicode(version):
@@ -65,6 +67,7 @@ class MozTrapTestCase(object):
     description = None
     id_prefix = None
     status = None
+    suites = []
     steps = []
     tags = []
     step_current_no = 0
@@ -72,8 +75,9 @@ class MozTrapTestCase(object):
     case_version_id = None
 
     def __init__(self, name, product_name, product_version, case_version_id=None,
-                 status="active", description=None, steps=None, id_prefix=mz_case_id_prefix):
+                 status="active", description=None, steps=None, id_prefix=mz_case_id_prefix, suites=None):
         self.name, self.description, self.status, self.case_version_id = name, description, status, case_version_id
+        self.suites = copy.deepcopy(suites)
         self.product_name, self.product_version = product_name, product_version
         self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
         if (steps is None): #http://stackoverflow.com/questions/1132941/least-astonishment-in-python-the-mutable-default-argument
@@ -91,14 +95,21 @@ class MozTrapTestCase(object):
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
-            step['resource_uri'] = resp.json()['resource_uri']
-            step['caseversion'] = resp.json()['caseversion']
+            step['resource_uri'] = resp.json['resource_uri']
+            step['caseversion'] = resp.json['caseversion']
             _check_respone_code(resp)
         return resp
 
     def _create_test_case(self):
         test_data = {'product': self.product_uri, 'idprefix': self.id_prefix}
         base_url = mtorigin + namespace_api_case
+        resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+        _check_respone_code(resp)
+        return resp
+
+    def _create_suite_case_relation(self, case_uri, suite_uri):
+        test_data = {'case': case_uri, 'suite': suite_uri}
+        base_url = mtorigin + namespace_api_suitecase
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
@@ -152,17 +163,19 @@ class MozTrapTestCase(object):
         self.steps.append({"instruction": instruction, "expected": expected, "number": number})
 
     def add_tag(self, name, description=None):
-        tag_uri_resp = self._get_tag_uri(name).json()
+        tag_uri_resp = self._get_tag_uri(name).json
         if len(tag_uri_resp['objects']) > 0:
             tag_uri = tag_uri_resp['objects'][0]['resource_uri']
         else:
-            tag_uri = self._create_tag(name, description).json()['resource_uri']
+            tag_uri = self._create_tag(name, description).json['resource_uri']
         self.tags.append(tag_uri)
 
     def create(self):
-        case_uri_resp = self._create_test_case().json()
+        case_uri_resp = self._create_test_case().json
         case_uri = case_uri_resp['resource_uri']
-        case_version_uri_resp = self._create_test_case_version(case_uri).json()
+        for suite_uri in self.suites:
+            self._create_suite_case_relation(case_uri, suite_uri)
+        case_version_uri_resp = self._create_test_case_version(case_uri).json
         case_version_uri = case_version_uri_resp['resource_uri']
         self._create_test_steps(case_version_uri)
         return case_version_uri_resp
@@ -183,13 +196,26 @@ class MozTrapTestCase(object):
 
         if self.case_version_id is None:
             _check_respone_code(resp)
-            return_objs = resp.json()['objects']
+            return_objs = resp.json['objects']
         else:
             if resp.status_code == 404:
                 logging.error("can't find the test case version with specify id: " + str(self.case_version_id))
                 return_objs = []
             else:
-                return_objs = [resp.json()]
+                return_objs = [resp.json]
+        return return_objs
+
+    def _get_case_uri(self):
+        return_objs = None
+        query_params = {"name": self.name, "product__name": self.product_name, "format": data_format}
+        base_url = mtorigin + namespace_api_case
+        resp = requests.get(base_url, params=query_params, headers=headers)
+        if resp.status_code == 404:
+            logging.error("can't find the test case with specify name: " + str(self.name))
+            return_objs = []
+        else:
+            return_objs = resp.json['objects']
+        print return_objs
         return return_objs
 
     def _clean_old_steps(self, case_steps):
@@ -213,7 +239,18 @@ class MozTrapTestCase(object):
                 self.__dict__.__setitem__(key_name, new_case_version_info[key_name])
         return resp
 
-    def update(self, new_case_version_info=None):
+    def _update_case_suite_relation(self, suites):
+        if suites is not None:
+            case_info_list = self._get_case_uri()
+            for case_info in case_info_list:
+                for suite_uri in suites:
+                    test_data = {'case': case_info['resource_uri'], 'suite': suite_uri}
+                    base_url = mtorigin + namespace_api_suitecase + str(case_info['id'])
+                    resp = requests.put(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+                    _check_respone_code(resp)
+
+    def update(self, new_case_version_info=None, suites=None):
+        self._update_case_suite_relation(suites)
         if len(self.case_version_objs) == 1:
             case_version_uri = self.case_version_objs[0]['resource_uri']
             case_steps = self.case_version_objs[0]['steps']
@@ -225,6 +262,98 @@ class MozTrapTestCase(object):
         else:
             for case_version_obj in self.case_version_objs:
                 logging.error("Duplicate case name exist in system, can't do the update! case version uri: " + case_version_obj['productversion'])
+
+
+class MozTrapTestSuite(object):
+    name = None
+    product_name = None
+    product_uri = None
+    product_version = None
+    product_version_uri = None
+    description = None
+    status = None
+    suite_id = None
+    suite_uri = None
+    suite_objs = None
+
+    def __init__(self, name, product_name, product_version, status="active", description=None):
+        self.name, self.description, self.status = name, description, status
+        self.product_name, self.product_version = product_name, product_version
+        self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
+        if user_params is None:
+            logging.error("Please set user params before init the MozTrapTest case!!!")
+
+    def _get_suite_objs(self):
+        return_objs = None
+        query_params = {"name": self.name, "product__name": self.product_name, "format": data_format}
+        base_url = mtorigin + namespace_api_suite
+        resp = requests.get(base_url, params=query_params, headers=headers)
+        if resp.status_code == 404:
+            logging.error("can't find the test suite with specify name: " + str(self.name) + " and specify product:" + str(self.product_name))
+            return_objs = []
+        else:
+            return_objs = copy.deepcopy(resp.json['objects'])
+        return return_objs
+
+    def _create_test_suite(self):
+        test_data = {'product': self.product_uri, 'name': self.name, 'description': self.description, 'status': self.status}
+        base_url = mtorigin + namespace_api_suite
+        resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+        _check_respone_code(resp)
+        return resp
+
+    def _delete_test_suite(self, specify_id=None):
+        if specify_id is None and self.suite_id is None:
+            logging.error("Please specify the suite id want to kill!")
+        if specify_id is None:
+            request_id = self.suite_id
+        else:
+            request_id = specify_id
+        base_url = mtorigin + namespace_api_suite
+        request_url = base_url + str(request_id)
+        resp = requests.delete(request_url, params=user_params, headers=headers)
+        _check_respone_code(resp)
+        return resp
+
+    def _update_test_suite(self, name=None, description=None, status=None, product_info=None):
+        test_data = {}
+        if product_info is not None:
+            self.product_uri, self.product_version_uri = get_product_uri(product_info['product_name'], product_info['product_version'])
+            test_data['product'] = self.product_uri
+        if name is not None:
+            self.name = name
+            test_data['name'] = self.name
+        if description is not None:
+            self.description = description
+            test_data['description'] = self.description
+        if status is not None:
+            self.status = status
+            test_data['status'] = self.status
+        request_url = mtorigin + namespace_api_suite + str(self.suite_id)
+        resp = requests.put(request_url, params=user_params, data=json.dumps(test_data), headers=headers)
+        _check_respone_code(resp)
+        return resp
+
+    def create(self):
+        suite_uri_resp = self._create_test_suite().json
+        self.suite_id = suite_uri_resp['id']
+        self.suite_uri = suite_uri_resp['resource_uri']
+        return suite_uri_resp
+
+    def delete(self, specify_id=None):
+        suite_delete_resp = self._delete_test_suite(specify_id)
+        return suite_delete_resp
+
+    def update(self, name=None, description=None, status=None, product_info=None):
+        suite_update_resp = self._update_test_suite(name, description, status, product_info)
+        return suite_update_resp
+
+    def existing_in_moztrap(self):
+        self.suite_objs = self._get_suite_objs()
+        if len(self.suite_objs) > 0:
+            return True
+        else:
+            return False
 
 
 
@@ -367,15 +496,17 @@ def load_json_into_moztrap(filename, credential, product_info=None):
     with open(filename, 'r') as f:
         # Determine its type (caseversion? suite?)
         suites = json.load(f)
-        #cases = orm.parseSuite(''.join(f.readlines()))
-        for case in suites[0]['testcases']:
-            # FIXME:  HRADCODE                                  v---------------
-            test_case_obj = MozTrapTestCase(case['id'], product_info['name'], product_info['version'])
-            #for step in case['steps']:
-            #    test_case_obj.add_step(step['instruction'], step['expected'])
-            test_case_obj.add_step(case['instructions'], "")
-            if test_case_obj.existing_in_moztrap():
-                test_case_obj.update()
-            else:
-                test_case_obj.create()
+        for suite in suites:
+            test_suite_obj = MozTrapTestSuite(suite['name'], product_info['name'], product_info['version'])
+            if test_suite_obj.existing_in_moztrap() is False:
+                test_suite_obj.create()
+            for case in suite['testcases']:
+                test_case_obj = MozTrapTestCase(case['id'], product_info['name'], product_info['version'], status=case['state'], suites=[test_suite_obj.suite_uri])
+                test_case_obj.add_step(case['instructions'], "")
+                if test_case_obj.existing_in_moztrap():
+                    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+                else:
+                    test_case_obj.create()
+
+
 
