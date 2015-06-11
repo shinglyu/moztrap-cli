@@ -47,7 +47,7 @@ def get_product_uri(name, version):
         base_url = mtorigin + namespace_api_product
         resp = requests.get(base_url, params=params)
         if _check_respone_code(resp):
-            product_obj_json = resp.json['objects'][0]
+            product_obj_json = resp.json()['objects'][0]
             product_uri = product_obj_json['resource_uri']
             for product_version in product_obj_json['productversions']:
                 if product_version['version'] == unicode(version):
@@ -95,8 +95,8 @@ class MozTrapTestCase(object):
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
-            step['resource_uri'] = resp.json['resource_uri']
-            step['caseversion'] = resp.json['caseversion']
+            step['resource_uri'] = resp.json()['resource_uri']
+            step['caseversion'] = resp.json()['caseversion']
             _check_respone_code(resp)
         return resp
 
@@ -163,19 +163,19 @@ class MozTrapTestCase(object):
         self.steps.append({"instruction": instruction, "expected": expected, "number": number})
 
     def add_tag(self, name, description=None):
-        tag_uri_resp = self._get_tag_uri(name).json
+        tag_uri_resp = self._get_tag_uri(name).json()
         if len(tag_uri_resp['objects']) > 0:
             tag_uri = tag_uri_resp['objects'][0]['resource_uri']
         else:
-            tag_uri = self._create_tag(name, description).json['resource_uri']
+            tag_uri = self._create_tag(name, description).json()['resource_uri']
         self.tags.append(tag_uri)
 
     def create(self):
-        case_uri_resp = self._create_test_case().json
+        case_uri_resp = self._create_test_case().json()
         case_uri = case_uri_resp['resource_uri']
         for suite_uri in self.suites:
             self._create_suite_case_relation(case_uri, suite_uri)
-        case_version_uri_resp = self._create_test_case_version(case_uri).json
+        case_version_uri_resp = self._create_test_case_version(case_uri).json()
         case_version_uri = case_version_uri_resp['resource_uri']
         self._create_test_steps(case_version_uri)
         return case_version_uri_resp
@@ -196,13 +196,13 @@ class MozTrapTestCase(object):
 
         if self.case_version_id is None:
             _check_respone_code(resp)
-            return_objs = resp.json['objects']
+            return_objs = resp.json()['objects']
         else:
             if resp.status_code == 404:
                 logging.error("can't find the test case version with specify id: " + str(self.case_version_id))
                 return_objs = []
             else:
-                return_objs = [resp.json]
+                return_objs = [resp.json()]
         return return_objs
 
     def _get_case_uri(self):
@@ -214,7 +214,7 @@ class MozTrapTestCase(object):
             logging.error("can't find the test case with specify name: " + str(self.name))
             return_objs = []
         else:
-            return_objs = resp.json['objects']
+            return_objs = resp.json()['objects']
         print return_objs
         return return_objs
 
@@ -292,7 +292,7 @@ class MozTrapTestSuite(object):
             logging.error("can't find the test suite with specify name: " + str(self.name) + " and specify product:" + str(self.product_name))
             return_objs = []
         else:
-            return_objs = copy.deepcopy(resp.json['objects'])
+            return_objs = copy.deepcopy(resp.json()['objects'])
         return return_objs
 
     def _create_test_suite(self):
@@ -335,7 +335,7 @@ class MozTrapTestSuite(object):
         return resp
 
     def create(self):
-        suite_uri_resp = self._create_test_suite().json
+        suite_uri_resp = self._create_test_suite().json()
         self.suite_id = suite_uri_resp['id']
         self.suite_uri = suite_uri_resp['resource_uri']
         return suite_uri_resp
