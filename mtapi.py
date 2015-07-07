@@ -8,6 +8,8 @@ import copy
 import config
 import orm
 
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 productversion = config.productversion
 mtorigin = config.mtorigin
 
@@ -35,7 +37,7 @@ def set_user_params(uname, akey, format=None):
 
 def _check_respone_code(check_response):
     if check_response.status_code not in [200, 201]:
-        #logging.error("Send the request to url: %s" % str(check_response.url))
+        logging.error("Send the request to url: %s" % str(check_response.url))
         logging.error("Got the return code: %s, the response is: %s" % (str(check_response.status_code), str(check_response.text)))
         return False
     return True
@@ -87,13 +89,13 @@ class MozTrapTestCase(object):
         self.id_prefix = id_prefix
         if user_params is None:
             logging.error("Please set user params before init the MozTrapTest case!!!")
-        self.case_version_objs = self._get_case_version_objs()
 
     def _create_test_steps(self, case_version_uri):
         base_url = mtorigin + namespace_api_case_step
         for step in self.steps:
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
+            logging.info('POST ' + base_url)
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
             step['resource_uri'] = resp.json()['resource_uri']
             step['caseversion'] = resp.json()['caseversion']
@@ -103,6 +105,7 @@ class MozTrapTestCase(object):
     def _create_test_case(self):
         test_data = {'product': self.product_uri, 'idprefix': self.id_prefix}
         base_url = mtorigin + namespace_api_case
+        logging.info('POST ' + base_url)
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
@@ -110,6 +113,7 @@ class MozTrapTestCase(object):
     def _create_suite_case_relation(self, case_uri, suite_uri):
         test_data = {'case': case_uri, 'suite': suite_uri}
         base_url = mtorigin + namespace_api_suitecase
+        logging.info('POST ' + base_url)
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
@@ -137,6 +141,7 @@ class MozTrapTestCase(object):
         return resp
 
     def existing_in_moztrap(self):
+        self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) > 0:
             return True
         else:
@@ -215,7 +220,7 @@ class MozTrapTestCase(object):
             return_objs = []
         else:
             return_objs = resp.json()['objects']
-        print return_objs
+        #print return_objs
         return return_objs
 
     def _clean_old_steps(self, case_steps):
@@ -251,6 +256,7 @@ class MozTrapTestCase(object):
 
     def update(self, new_case_version_info=None, suites=None):
         self._update_case_suite_relation(suites)
+        self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) == 1:
             case_version_uri = self.case_version_objs[0]['resource_uri']
             case_steps = self.case_version_objs[0]['steps']
@@ -298,6 +304,7 @@ class MozTrapTestSuite(object):
     def _create_test_suite(self):
         test_data = {'product': self.product_uri, 'name': self.name, 'description': self.description, 'status': self.status}
         base_url = mtorigin + namespace_api_suite
+        logging.info('POST ' + base_url)
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
@@ -311,6 +318,7 @@ class MozTrapTestSuite(object):
             request_id = specify_id
         base_url = mtorigin + namespace_api_suite
         request_url = base_url + str(request_id)
+        logging.info('DELETE' + base_url)
         resp = requests.delete(request_url, params=user_params, headers=headers)
         _check_respone_code(resp)
         return resp
@@ -330,6 +338,7 @@ class MozTrapTestSuite(object):
             self.status = status
             test_data['status'] = self.status
         request_url = mtorigin + namespace_api_suite + str(self.suite_id)
+        logging.info('DELETE ' + request_url)
         resp = requests.put(request_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
