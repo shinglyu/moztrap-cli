@@ -115,8 +115,6 @@ class MozTrapTestCase(object):
         test_data = {'case': case_uri, 'suite': suite_uri}
         base_url = mtorigin + namespace_api_suitecase
         logging.info('POST ' + base_url)
-        import pdb
-        pdb.set_trace()
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
         _check_respone_code(resp)
         return resp
@@ -514,8 +512,6 @@ def load_json_into_moztrap(filename, credential, product_info=None):
             if test_suite_obj.existing_in_moztrap() is False:
                 test_suite_obj.create()
             for case in suite['testcases']:
-                import pdb
-                pdb.set_trace()
                 test_case_obj = MozTrapTestCase(case['id'], product_info['name'], product_info['version'], status=case['state'], suites=[test_suite_obj.suite_uri])
                 test_case_obj.add_step(case['instructions'], "")
                 if test_case_obj.existing_in_moztrap():
