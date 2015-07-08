@@ -359,10 +359,22 @@ class MozTrapTestSuite(object):
         suite_update_resp = self._update_test_suite(name, description, status, product_info)
         return suite_update_resp
 
+    def should_update(self):
+        if (self.suite_objs[0]['name'] != self.name or
+            self.suite_objs[0]['status'] != self.status or
+            self.suite_objs[0]['description'] != self.description):
+            return True
+        else:
+            return False
+
     def existing_in_moztrap(self):
         self.suite_objs = self._get_suite_objs()
-        if len(self.suite_objs) > 0:
+        if len(self.suite_objs) == 1:
+            self.suite_id = self.suite_objs[0]['id']
+            self.suite_uri = self.suite_objs[0]['resource_uri']
             return True
+        elif len(self.suite_objs) > 1:
+            raise Exception("The suite is ambiguous, please make sure the suite is unique on the MozTrap server")
         else:
             return False
 

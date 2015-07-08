@@ -42,6 +42,7 @@ class TestMTApi(unittest.TestCase):
         for expected, actual in zip(expecteds, actuals):
             self.assertEqual(expected[0] , actual.request.method)
             self.assertIn(expected[1]    , actual.request.url)
+
     @responses.activate
     def test_init_testcase_object_wout_suite(self):
         responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
@@ -133,51 +134,258 @@ class TestMTApi(unittest.TestCase):
         self._verify_call_order(expecteds, responses.calls)
 
     @responses.activate
-    def test_init_testcase_object_w_suite(self):
+    def test_create_suite_obj(self):
         responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
                       body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
                       status=200,
                       content_type="application/json")
-        responses.add(responses.POST, self.base_url + "/api/v1/" + "case/",
-                      body='{"resource_uri": "/api/v1/case/123"}',
+        responses.add(responses.POST, self.base_url + "/api/v1/" + "suite/",
+                      body='{ "description": "This is an awesome suite", "id": 888, "name": "Test Suite", "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/suite/888/", "status": "active" }',
                       status=201, content_type="application/json")
-        responses.add(responses.POST, self.base_url + "/api/v1/" + "suitecase/",
-                      body='{"resource_uri": "/api/v1/suitecase/654"}',
-                      status=201, content_type="application/json")
-        responses.add(responses.POST, self.base_url + "/api/v1/" + "caseversion/",
-                      body='{"resource_uri": "/api/v1/caseversion/12345"}',
-                      status=201, content_type="application/json")
-        responses.add(responses.POST, self.base_url + "/api/v1/" + "casestep/",
-                      body='{"caseversion": "/api/v1/caseversion/12345","resource_uri": "/api/v1/casestep/12"}',
-                      status=201, content_type="application/json")
-        case = {
-            'id': '12345',
-            'productname': "Firefox OS",
-            'version': 'v2.2',
-            'status': 'active',
-            'suites': ["/api/v1/suite/543"],
-        }
-        test_case_obj = mtapi.MozTrapTestCase(case['id'],
-                                        case['productname'],
-                                        case['version'],
-                                        status=case['status'],
-                                        suites=case['suites'])
-        test_case_obj.add_step("open foo", "see bar")
-        test_case_obj.add_step("close foo", "don't see bar")
+        suite = [
+            'Test Suite',
+            'Firefox OS',
+            'v2.2',
+            'active',
+            'This is an awesome suite'
+        ]
+        test_suite_obj= mtapi.MozTrapTestSuite(*suite)
         #if test_case_obj.existing_in_moztrap():
         #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
         #else:
-        test_case_obj.create()
+        test_suite_obj.create()
 
         expecteds = [
             ("GET" , "product"),
-            ("POST", "case"),
-            ("POST", "suitecase"),
-            ("POST", "caseversion"),
-            ("POST", "casestep"),
-            ("POST", "casestep"),
+            ("POST", "suite"),
         ]
         self._verify_call_order(expecteds, responses.calls)
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
 
+    @responses.activate
+    def test_suite_init_doesnt_exist(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "suite/",# + "?format=json&name=Test+Suite&product__name=Firefox+OS",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 0 }, "objects": []}',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.POST, self.base_url + "/api/v1/" + "suite/",
+                      body='{ "description": "This is an awesome suite", "id": 888, "name": "Test Suite", "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/suite/888/", "status": "active" }',
+                      status=201, content_type="application/json")
+        suite = [
+            'Test Suite',
+            'Firefox OS',
+            'v2.2',
+            'active',
+            'This is an awesome suite'
+        ]
+        test_suite_obj= mtapi.MozTrapTestSuite(*suite)
+        self.assertFalse(test_suite_obj.existing_in_moztrap())
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            #'suite_id',
+            #'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        test_suite_obj.create()
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+
+        expecteds = [
+            ("GET" , "product"),
+            ("GET", "suite"),
+            ("POST", "suite"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+
+    @responses.activate
+    def test_suite_init_exist_noupdate(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ \
+                      { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "suite/",# + "?format=json&name=Test+Suite&product__name=Firefox+OS",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [{\
+                              "created_by": null,\
+                              "description": "This is an awesome suite",\
+                              "id": 888,\
+                              "modified_by": null,\
+                              "modified_on": "2012-03-01T19:38:14",\
+                              "name": "Test Suite",\
+                              "product": "/api/v1/product/115540/",\
+                              "resource_uri": "/api/v1/suite/888/",\
+                              "status": "active"\
+                      }]}',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.POST, self.base_url + "/api/v1/" + "suite/",
+                      body='{ "description": "This is an awesome suite", "id": 888, "name": "Test Suite", "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/suite/888/", "status": "active" }',
+                      status=201, content_type="application/json")
+        suite = [
+            'Test Suite',
+            'Firefox OS',
+            'v2.2',
+            'active',
+            'This is an awesome suite'
+        ]
+        test_suite_obj= mtapi.MozTrapTestSuite(*suite)
+        self.assertTrue(test_suite_obj.existing_in_moztrap())
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        self.assertFalse(test_suite_obj.should_update())
+        #test_suite_obj.update()
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+
+        expecteds = [
+            ("GET" , "product"),
+            ("GET", "suite"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+
+    @responses.activate
+    def test_suite_init_exist_update(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ \
+                      { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "suite/",# + "?format=json&name=Test+Suite&product__name=Firefox+OS",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [{\
+                              "created_by": null,\
+                              "description": "This is an awesome suite",\
+                              "id": 888,\
+                              "modified_by": null,\
+                              "modified_on": "2012-03-01T19:38:14",\
+                              "name": "Test Suite",\
+                              "product": "/api/v1/product/115540/",\
+                              "resource_uri": "/api/v1/suite/888/",\
+                              "status": "active"\
+                      }]}',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.POST, self.base_url + "/api/v1/" + "suite/",
+                      body='{ "description": "This is an awesome suite", "id": 888, "name": "Test Suite", "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/suite/888/", "status": "active" }',
+                      status=201, content_type="application/json")
+        suite = [
+            'Test Suite',
+            'Firefox OS',
+            'v2.2',
+            'active',
+            'This is a MODIFIED awesome suite'
+        ]
+        test_suite_obj= mtapi.MozTrapTestSuite(*suite)
+        self.assertTrue(test_suite_obj.existing_in_moztrap())
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        self.assertTrue(test_suite_obj.should_update())
+        test_suite_obj.update()
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+
+        expecteds = [
+            ("GET" , "product"),
+            ("GET", "suite"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
 if __name__ == '__main__':
     unittest.main()
