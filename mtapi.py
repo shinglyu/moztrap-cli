@@ -525,11 +525,23 @@ def load_json_into_moztrap(filename, credential, product_info=None):
                 test_suite_obj.create()
             for case in suite['testcases']:
                 test_case_obj = MozTrapTestCase(case['id'], product_info['name'], product_info['version'], status=case['state'], suites=[test_suite_obj.suite_uri])
+
                 test_case_obj.add_step(case['instructions'], "")
+                _add_all_type_of_variables_if_exist(test_case_obj, case)
+
                 if test_case_obj.existing_in_moztrap():
                     test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
                 else:
                     test_case_obj.create()
 
+def _add_all_type_of_variables_if_exist(test_case_obj, case):
+    for i in ('variables', 'variablesFromSuite'):
+        try:
+            _add_variables_if_exist(test_case_obj, case[i])
+        except KeyError:
+            # We accept jsons that don't contain a (or any) key mentioned above
+            pass
 
-
+def _add_variables_if_exist(test_case_obj, variables):
+    for variable in variables:
+        test_case_obj.add_step(variable, '')
