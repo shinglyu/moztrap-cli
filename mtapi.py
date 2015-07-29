@@ -90,10 +90,13 @@ class MozTrapTestCase(object):
         self.id_prefix = id_prefix
         if user_params is None:
             logging.error("Please set user params before init the MozTrapTest case!!!")
+        logging.info("Test case \"" + name + "\" created")
 
     def _create_test_steps(self, case_version_uri):
         base_url = mtorigin + namespace_api_case_step
         for step in self.steps:
+            logging.info("Creating step #" + str(step['number']) + " for case " + self.name)
+
             data = {"caseversion": case_version_uri, "instruction": step['instruction'],
                     "expected": step['expected'], "number": step['number']}
             logging.info('POST ' + base_url)
@@ -112,6 +115,7 @@ class MozTrapTestCase(object):
         return resp
 
     def _create_suite_case_relation(self, case_uri, suite_uri):
+        logging.info("Adding the case " + case_uri + "to suite " + suite_uri)
         test_data = {'case': case_uri, 'suite': suite_uri}
         base_url = mtorigin + namespace_api_suitecase
         logging.info('POST ' + base_url)
@@ -142,6 +146,7 @@ class MozTrapTestCase(object):
         return resp
 
     def existing_in_moztrap(self):
+        logging.info("Checking if the test case exists in moztrap")
         self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) > 0:
             return True
@@ -163,12 +168,14 @@ class MozTrapTestCase(object):
             logging.error("can't find the step number in current steps: " + str(self.steps))
 
     def add_step(self, instruction, expected, number=0):
+        logging.info("Adding test step to case " + self.name)
         if number == 0:
             self.step_current_no += 1
             number = self.step_current_no
         self.steps.append({"instruction": instruction, "expected": expected, "number": number})
 
     def add_tag(self, name, description=None):
+        logging.info("Adding tag to case " + self.name)
         tag_uri_resp = self._get_tag_uri(name).json()
         if len(tag_uri_resp['objects']) > 0:
             tag_uri = tag_uri_resp['objects'][0]['resource_uri']
@@ -177,6 +184,7 @@ class MozTrapTestCase(object):
         self.tags.append(tag_uri)
 
     def create(self):
+        logging.info("Creating the test case in moztrap")
 
         case_uri_resp = self._create_test_case().json()
         case_uri = case_uri_resp['resource_uri']
@@ -252,12 +260,13 @@ class MozTrapTestCase(object):
             for case_info in case_info_list:
                 for suite_uri in suites:
                     test_data = {'case': case_info['resource_uri'], 'suite': suite_uri}
-                    base_url = mtorigin + namespace_api_suitecase + str(case_info['id'])
+                    base_url = mtorigin + namespace_api_suitecase + str(case_info['id']) #BUG HERE
                     resp = requests.put(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
                     _check_respone_code(resp)
 
     def update(self, new_case_version_info=None, suites=None):
-        self._update_case_suite_relation(suites)
+        logging.info("Updating the test case on moztrap")
+        #self._update_case_suite_relation(suites)
         self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) == 1:
             case_version_uri = self.case_version_objs[0]['resource_uri']
@@ -290,6 +299,7 @@ class MozTrapTestSuite(object):
         self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
         if user_params is None:
             logging.error("Please set user params before init the MozTrapTest case!!!")
+        logging.info("Suite " + name + " created")
 
     def _get_suite_objs(self):
         return_objs = None
@@ -346,28 +356,35 @@ class MozTrapTestSuite(object):
         return resp
 
     def create(self):
+        logging.info("Creating the suite on moztrap")
         suite_uri_resp = self._create_test_suite().json()
         self.suite_id = suite_uri_resp['id']
         self.suite_uri = suite_uri_resp['resource_uri']
         return suite_uri_resp
 
     def delete(self, specify_id=None):
+        logging.info("Deleting the suite on moztrap")
         suite_delete_resp = self._delete_test_suite(specify_id)
         return suite_delete_resp
 
     def update(self, name=None, description=None, status=None, product_info=None):
+        logging.info("Updating the suite on moztrap")
         suite_update_resp = self._update_test_suite(name, description, status, product_info)
         return suite_update_resp
 
     def should_update(self):
+        logging.info("Checking if the suite has been modified")
         if (self.suite_objs[0]['name'] != self.name or
             self.suite_objs[0]['status'] != self.status or
             self.suite_objs[0]['description'] != self.description):
+            logging.info("Suite has been modified")
             return True
         else:
+            logging.info("Suite has not been modified")
             return False
 
     def existing_in_moztrap(self):
+        logging.info("Checking if the suite exists in moztrap")
         self.suite_objs = self._get_suite_objs()
         if len(self.suite_objs) == 1:
             self.suite_id = self.suite_objs[0]['id']
@@ -534,6 +551,34 @@ def load_json_into_moztrap(filename, credential, product_info=None):
                 else:
                     test_case_obj.create()
 
+def sync_diff_to_moztrap(diffs, credential, product_info=None):
+    set_user_params(credential['username'], credential['api_key']) #TODO
+    if product_info is None:
+        # TODO: read product from test case namespace id
+        product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
+    for diff in diffs:
+        for newsuite in diff['suite']['added']:
+            #TODO: use different product for different suite?
+            test_suite_obj = MozTrapTestSuite(newsuite, product_info['name'], product_info['version'])
+            test_suite_obj.create()
+
+        for newcase in diff['case']['added']:
+            #TODO: use different product for different suite?
+            test_suite_obj = MozTrapTestCase(newcase,
+                                             product_info['name'],
+                                             product_info['version'],
+                                             status=newcase['state'],
+                                             suites=newcase['suites'])
+            test_suite_obj.create()
+
+        for newcase in diff['case']['modified']:
+            #TODO: use different product for different suite?
+            test_suite_obj = MozTrapTestCase(newcase,
+                                             product_info['name'],
+                                             product_info['version'],
+                                             status=newcase['state'],
+                                             suites=newcase['suites'])
+            test_suite_obj.update()
 def _add_all_type_of_variables_if_exist(test_case_obj, case):
     for i in ('variables', 'variablesFromSuite'):
         try:
