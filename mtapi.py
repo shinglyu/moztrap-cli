@@ -268,7 +268,9 @@ class MozTrapTestCase(object):
 
     def update(self, new_case_version_info=None, suites=None):
         logging.info("Updating the test case on moztrap")
-        #self._update_case_suite_relation(suites)
+        self._update_case_suite_relation(suites)
+        #import pdb
+        #pdb.set_trace()
         self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) == 1:
             case_version_uri = self.case_version_objs[0]['resource_uri']
@@ -592,13 +594,14 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
 
         for newcase in diff['case']['added']:
             #TODO: use different product for different suite?
-            test_suite_obj = _create_case_obj_from_parser_output(newcase, product_info, suite_name_to_uri)
-            test_suite_obj.create()
+            test_case_obj= _create_case_obj_from_parser_output(newcase, product_info, suite_name_to_uri)
+            test_case_obj.create()
 
         for modifiedcase in diff['case']['modified']:
             #TODO: use different product for different suite?
-            test_suite_obj = _create_case_obj_from_parser_output(modifiedcase, product_info, suite_name_to_uri)
-            test_suite_obj.update()
+            test_case_obj = _create_case_obj_from_parser_output(modifiedcase, product_info, suite_name_to_uri)
+            #test_case_obj.existing_in_moztrap()
+            test_case_obj.update()
 def _add_all_type_of_variables_if_exist(test_case_obj, case):
     for i in ('variables', 'variablesFromSuite'):
         try:
