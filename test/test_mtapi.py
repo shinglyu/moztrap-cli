@@ -389,6 +389,13 @@ class TestMTApi(unittest.TestCase):
                     }
                 ])
 
+    def _fill_steps(self, step_str):
+        return ([{
+            'instruction': step_str,
+            'expected': "",
+            'number': 0
+        }])
+
     @mock.patch('mtapi.MozTrapTestSuite', autospec=True)
     def test_sync_diff_to_moztrap_add_suite(self, mock_mttestsuite):
 
@@ -407,24 +414,27 @@ class TestMTApi(unittest.TestCase):
     def test_sync_diff_to_moztrap_add_case(self, mock_mttestsuite, mock_mttestcase):
 
         diff_outs = self._prepare_empty_diff()
-        diff_outs[0]['case']['added'] = [{
+        expected_add = {
                             "bug": 2,
                             "id": "fxos.func.sanity.launch_foobar",
                             "instructions": "Launch FOOBAR",
                             "state": "draft",
                             "userStory": 1,
-                            "suites": ["Launch suite"]}]
+                            "suites": ["Launch suite"]}
+        diff_outs[0]['case']['added'] = [expected_add]
         #mock_suites = [mock.Mock()]
         #mock_mttestsuite.side_effect = mock_suites
         mock_cases= [mock.Mock()]
         mock_mttestcase.side_effect = mock_cases
         mtapi.sync_diff_to_moztrap(diff_outs, {'username': "foo", 'api_key': "bar"})
         #self.assertTrue(mock_suites[0].create.called, "Create function was not called")
-        mock_mttestcase.assert_called_once_with(diff_outs[0]['case']['added'][0],
-                                                "Firefox OS",
-                                                "v2.2",
-                                                status=diff_outs[0]['case']['added'][0]['state'],
-                                                suites=diff_outs[0]['case']['added'][0]['suites'])
+        mock_mttestcase.assert_called_once_with(name=expected_add['id'],
+                                                product_name="Firefox OS",
+                                                product_version="v2.2",
+                                                status=expected_add['state'],
+                                                suites=expected_add['suites'],
+                                                steps=self._fill_steps(expected_add['instructions'])
+                                                )
 
         mock_cases[0].create.assert_called_once()
 
@@ -433,24 +443,27 @@ class TestMTApi(unittest.TestCase):
     def test_sync_diff_to_moztrap_update_case(self, mock_mttestsuite, mock_mttestcase):
 
         diff_outs = self._prepare_empty_diff()
-        diff_outs[0]['case']['modified'] = [{
+        expected_modify = {
                             "bug": 2,
                             "id": "fxos.func.sanity.launch_foobar",
                             "instructions": "Launch FOOBAR",
                             "state": "draft",
                             "userStory": 1,
-                            "suites": ["Launch suite"]}]
+                            "suites": ["Launch suite"]}
+        diff_outs[0]['case']['modified'] = [expected_modify]
         #mock_suites = [mock.Mock()]
         #mock_mttestsuite.side_effect = mock_suites
         mock_cases= [mock.Mock()]
         mock_mttestcase.side_effect = mock_cases
         mtapi.sync_diff_to_moztrap(diff_outs, {'username': "foo", 'api_key': "bar"})
         #self.assertTrue(mock_suites[0].create.called, "Create function was not called")
-        mock_mttestcase.assert_called_once_with(diff_outs[0]['case']['modified'][0],
-                                                "Firefox OS",
-                                                "v2.2",
-                                                status=diff_outs[0]['case']['modified'][0]['state'],
-                                                suites=diff_outs[0]['case']['modified'][0]['suites'])
+        mock_mttestcase.assert_called_once_with(name=expected_modify['id'],
+                                                product_name="Firefox OS",
+                                                product_version="v2.2",
+                                                status=expected_modify['state'],
+                                                suites=expected_modify['suites'],
+                                                steps=self._fill_steps(expected_modify['instructions'])
+                                                )
 
         mock_cases[0].update.assert_called_once()
 

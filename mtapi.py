@@ -95,10 +95,12 @@ class MozTrapTestCase(object):
     def _create_test_steps(self, case_version_uri):
         base_url = mtorigin + namespace_api_case_step
         for step in self.steps:
-            logging.info("Creating step #" + str(step['number']) + " for case " + self.name)
+            logging.info("Creating step for case " + self.name)
 
-            data = {"caseversion": case_version_uri, "instruction": step['instruction'],
-                    "expected": step['expected'], "number": step['number']}
+            data = {"caseversion": case_version_uri,
+                    "instruction": step['instruction'],
+                    "expected": step['expected'],
+                    "number": step['number']}
             logging.info('POST ' + base_url)
             resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
             step['resource_uri'] = resp.json()['resource_uri']
@@ -551,33 +553,51 @@ def load_json_into_moztrap(filename, credential, product_info=None):
                 else:
                     test_case_obj.create()
 
+def _create_case_obj_from_parser_output(parser_output, product_info, suite_name_to_uri):
+    if not isinstance(parser_output['instructions'], list):
+        steps = [{'instruction':parser_output['instructions'],
+                  'expected': "",
+                  'number': 0
+                  }]
+    else:
+        steps = parser_output['instructions']
+    return MozTrapTestCase(name=parser_output['id'],
+                           product_name=product_info['name'],
+                           product_version=product_info['version'],
+                           status=parser_output['state'],
+                           suites=map(lambda x: suite_name_to_uri[x], parser_output['suites']),
+                           steps=steps
+                          )
+
 def sync_diff_to_moztrap(diffs, credential, product_info=None):
     set_user_params(credential['username'], credential['api_key']) #TODO
     if product_info is None:
         # TODO: read product from test case namespace id
         product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
+    suite_name_to_uri = {}
     for diff in diffs:
         for newsuite in diff['suite']['added']:
             #TODO: use different product for different suite?
             test_suite_obj = MozTrapTestSuite(newsuite, product_info['name'], product_info['version'])
             test_suite_obj.create()
+            if newsuite not in suite_name_to_uri:
+                suite_name_to_uri[newsuite] = test_suite_obj.suite_uri
+
+        for suite in diff['suite']['existing']:
+            #TODO: use different product for different suite?
+            test_suite_obj = MozTrapTestSuite(suite, product_info['name'], product_info['version'])
+            test_suite_obj.existing_in_moztrap()
+            if suite not in suite_name_to_uri:
+                suite_name_to_uri[suite] = test_suite_obj.suite_uri
 
         for newcase in diff['case']['added']:
             #TODO: use different product for different suite?
-            test_suite_obj = MozTrapTestCase(newcase,
-                                             product_info['name'],
-                                             product_info['version'],
-                                             status=newcase['state'],
-                                             suites=newcase['suites'])
+            test_suite_obj = _create_case_obj_from_parser_output(newcase, product_info, suite_name_to_uri)
             test_suite_obj.create()
 
-        for newcase in diff['case']['modified']:
+        for modifiedcase in diff['case']['modified']:
             #TODO: use different product for different suite?
-            test_suite_obj = MozTrapTestCase(newcase,
-                                             product_info['name'],
-                                             product_info['version'],
-                                             status=newcase['state'],
-                                             suites=newcase['suites'])
+            test_suite_obj = _create_case_obj_from_parser_output(modifiedcase, product_info, suite_name_to_uri)
             test_suite_obj.update()
 def _add_all_type_of_variables_if_exist(test_case_obj, case):
     for i in ('variables', 'variablesFromSuite'):
