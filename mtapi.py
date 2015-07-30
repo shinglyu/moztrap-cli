@@ -106,7 +106,7 @@ class MozTrapTestCase(object):
             step['resource_uri'] = resp.json()['resource_uri']
             step['caseversion'] = resp.json()['caseversion']
             _check_respone_code(resp)
-        return resp
+        return
 
     def _create_test_case(self):
         test_data = {'product': self.product_uri, 'idprefix': self.id_prefix}
@@ -118,6 +118,15 @@ class MozTrapTestCase(object):
 
     def _create_suite_case_relation(self, case_uri, suite_uri):
         logging.info("Adding the case " + case_uri + "to suite " + suite_uri)
+        test_data = {'case': case_uri, 'suite': suite_uri}
+        base_url = mtorigin + namespace_api_suitecase
+        logging.info('POST ' + base_url)
+        resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+        _check_respone_code(resp)
+        return resp
+
+    def _delete_suite_case_relation(self, case_uri, suite_uri):
+        logging.info("Removing the case " + case_uri + "from suite " + suite_uri)
         test_data = {'case': case_uri, 'suite': suite_uri}
         base_url = mtorigin + namespace_api_suitecase
         logging.info('POST ' + base_url)
@@ -256,19 +265,20 @@ class MozTrapTestCase(object):
                 self.__dict__.__setitem__(key_name, new_case_version_info[key_name])
         return resp
 
-    def _update_case_suite_relation(self, suites):
-        if suites is not None:
-            case_info_list = self._get_case_uri()
-            for case_info in case_info_list:
-                for suite_uri in suites:
-                    test_data = {'case': case_info['resource_uri'], 'suite': suite_uri}
-                    base_url = mtorigin + namespace_api_suitecase + str(case_info['id']) #BUG HERE
-                    resp = requests.put(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
-                    _check_respone_code(resp)
+    #def _update_case_suite_relation(self):
+    #    if self.suites is not None:
+    #        case_info_list = self._get_case_uri()
+    #        for case_info in case_info_list:
+    #            for suite_uri in self.suites:
+    #                test_data = {'case': case_info['resource_uri'], 'suite': suite_uri}
+    #                base_url = mtorigin + namespace_api_suitecase + str(case_info['id']) #BUG HERE
+    #                resp = requests.put(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+    #                _check_respone_code(resp)
 
-    def update(self, new_case_version_info=None, suites=None):
+    def update(self, new_case_version_info=None, suites_added=None, suites_removed=None): #perhaps we need the suites here,
+        #The self.suites should reflect the upstram suites, suites here should be what it want it to be
         logging.info("Updating the test case on moztrap")
-        self._update_case_suite_relation(suites)
+        #self._update_case_suite_relation()
         #import pdb
         #pdb.set_trace()
         self.case_version_objs = self._get_case_version_objs()
@@ -278,6 +288,13 @@ class MozTrapTestCase(object):
             self._update_case_steps(case_version_uri, case_steps)
             if new_case_version_info:
                 self._update_case_version(case_version_uri, new_case_version_info)
+
+            case_uri = self._get_case_uri()[0]['resource_uri']
+            for suite in suites_added:
+                self._create_suite_case_relation(case_uri, suite)
+            for suite in suites_removed:
+                self._delete_suite_case_relation(case_uri, suite)
+
         elif len(self.case_version_objs) == 0:
             logging.error("Can't find any case fulfill the attributes (%s,%s,%s)" % (self.name, self.product_name, self.product_version))
         else:
@@ -589,7 +606,7 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             #TODO: use different product for different suite?
             test_suite_obj = MozTrapTestSuite(suite, product_info['name'], product_info['version'])
             test_suite_obj.existing_in_moztrap()
-            if suite not in suite_name_to_uri:
+            if (suite not in suite_name_to_uri):
                 suite_name_to_uri[suite] = test_suite_obj.suite_uri
 
         for newcase in diff['case']['added']:
