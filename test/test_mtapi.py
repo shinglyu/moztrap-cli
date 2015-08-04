@@ -25,8 +25,8 @@ class TestMTApi(unittest.TestCase):
             #for expected, actual in zip(expecteds, actuals):
             for expected, actual in map(None, expecteds, actuals):
                 print expected, actual
-                self.assertEqual(expected[0] , actual.request.method)
                 self.assertIn(expected[1]    , actual.request.url)
+                self.assertEqual(expected[0] , actual.request.method)
             self.assertEqual(len(expecteds), len(actuals))
 
     @responses.activate
@@ -170,6 +170,67 @@ class TestMTApi(unittest.TestCase):
             ("POST", "suitecase"), # Actually is't a DELETE
         ]
         self._verify_call_order(expecteds, responses.calls)
+
+    @responses.activate
+    def test_testcase_object_add_step(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        with open('base_caseversion.json', 'r') as f:
+            caseversiontext = ''.join(f.readlines())
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",# + "?name=Firefox+OS&format=json",
+                      #body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+                      body=caseversiontext,
+                      status=200,
+                      content_type="application/json")
+        #responses.add(responses.GET, self.base_url + "/api/v1/" + "case/",# + "?name=Firefox+OS&format=json",
+        #              body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+        #              status=200,
+        #              content_type="application/json")
+        #responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",
+        #              body='{"resource_uri": "/api/v1/caseversion/12345", "steps": [{id:555}, {id:666}]}',
+        #              status=201, content_type="application/json")
+        responses.add(responses.POST, self.base_url + "/api/v1/" + "casestep/",
+                      body='',
+                      status=201, content_type="application/json")
+        responses.add(responses.PUT, self.base_url + "/api/v1/" + "casestep/",
+                      body='',
+                      status=201, content_type="application/json")
+        case = {
+            'id': '12345',
+            'productname': "Firefox OS",
+            'version': 'v2.2',
+            'status': 'active',
+            'suites': [],
+            'suites_added':[],
+            'suites_removed':[]
+        }
+        test_case_obj = mtapi.MozTrapTestCase(case['id'],
+                                        case['productname'],
+                                        case['version'],
+                                        status=case['status'],
+                                        suites=case['suites'])
+        test_case_obj.add_step("open foo", "see bar")
+        test_case_obj.add_step("close foo", "don't see bar")
+        test_case_obj.add_step("reopen foo", "don't see bar")
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+        test_case_obj.update()
+
+        expecteds = [
+            ("GET", "product"),
+            ("GET", "caseversion"),
+            ("PUT", "casestep"),
+            ("PUT", "casestep"),
+            ("POST", "casestep"), # Actually is't a DELETE
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+
+    @responses.activate
+    def test_testcase_object_remove_step(self):
+        raise NotImplementedError
     @responses.activate
     def test_create_suite_obj(self):
         responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",

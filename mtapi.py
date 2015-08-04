@@ -76,6 +76,7 @@ class MozTrapTestCase(object):
     step_current_no = 0
     case_version_objs = None
     case_version_id = None
+    case_uri = None
 
     def __init__(self, name, product_name, product_version, case_version_id=None,
                  status="active", description=None, steps=None, id_prefix=mz_case_id_prefix, suites=None):
@@ -232,6 +233,8 @@ class MozTrapTestCase(object):
         return return_objs
 
     def _get_case_uri(self):
+        if not self.case_uri is None:
+            return self.case_uri
         return_objs = None
         query_params = {"name": self.name, "product__name": self.product_name, "format": data_format}
         base_url = mtorigin + namespace_api_case
@@ -242,7 +245,8 @@ class MozTrapTestCase(object):
         else:
             return_objs = resp.json()['objects']
         #print return_objs
-        return return_objs
+        self.case_uri = return_objs[0]['resource_uri']
+        return self.case_uri
 
     def _clean_old_steps(self, case_steps):
         for step in case_steps:
@@ -253,8 +257,28 @@ class MozTrapTestCase(object):
             _check_respone_code(resp)
 
     def _update_case_steps(self, case_version_uri, case_steps):
-        self._clean_old_steps(case_steps)
-        self._create_test_steps(case_version_uri)
+        #self.caseversion_objs is retrived in update()
+        remote_steps = self.case_version_objs[0]['steps']
+        step_no = 1
+        for local_step, remote_step in map(None, case_steps, remote_steps):
+            if remote_step is None:
+                raise NotImplementedError
+                #create step
+            # if local_step is None:
+                #delete remote step
+            else:
+                base_url = mtorigin + remote_step['resource_uri']
+                resp = requests.put(base_url, params=user_params, data=json.dumps(local_step), headers=headers)
+                _check_respone_code(resp)
+
+            step_no += 1
+
+
+        #import pdb
+        #pdb.set_trace()
+        #self._clean_old_steps(case_steps) # just put, dont' delete
+        #self._create_test_steps(case_version_uri)
+        return
 
     def _update_case_version(self, case_version_uri, new_case_version_info):
         base_url = mtorigin + case_version_uri
@@ -289,11 +313,14 @@ class MozTrapTestCase(object):
             if new_case_version_info:
                 self._update_case_version(case_version_uri, new_case_version_info)
 
-            case_uri = self._get_case_uri()[0]['resource_uri']
-            for suite in suites_added:
-                self._create_suite_case_relation(case_uri, suite)
-            for suite in suites_removed:
-                self._delete_suite_case_relation(case_uri, suite)
+            if (not suites_added is None):
+                case_uri = self._get_case_uri()
+                for suite in suites_added:
+                    self._create_suite_case_relation(case_uri, suite)
+            if (not suites_removed is None):
+                case_uri = self._get_case_uri()
+                for suite in suites_removed:
+                    self._delete_suite_case_relation(case_uri, suite)
 
         elif len(self.case_version_objs) == 0:
             logging.error("Can't find any case fulfill the attributes (%s,%s,%s)" % (self.name, self.product_name, self.product_version))
