@@ -128,10 +128,17 @@ class MozTrapTestCase(object):
 
     def _delete_suite_case_relation(self, case_uri, suite_uri):
         logging.info("Removing the case " + case_uri + "from suite " + suite_uri)
-        test_data = {'case': case_uri, 'suite': suite_uri}
+        case_id = os.path.basename(os.path.dirname(case_uri))
+        suite_id = os.path.basename(os.path.dirname(case_uri))
+
         base_url = mtorigin + namespace_api_suitecase
-        logging.info('POST ' + base_url)
-        resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
+        params = {'case': case_id, 'suite': suite_id}
+        suitecase_resp = requests.get(base_url, params=params, headers=headers)
+        _check_respone_code(suitecase_resp)
+
+        suitecase_id = suitecase_resp.json()['objects'][0]['id']
+        logging.info('DELETE' + base_url)
+        resp = requests.delete(base_url + suitecase_id + "/", params=user_params, headers=headers)
         _check_respone_code(resp)
         return resp
 
@@ -262,9 +269,24 @@ class MozTrapTestCase(object):
         step_no = 1
         for local_step, remote_step in map(None, case_steps, remote_steps):
             if remote_step is None:
-                raise NotImplementedError
-                #create step
-            # if local_step is None:
+                base_url = mtorigin + namespace_api_case_step
+                logging.info("Creating step for case " + self.name)
+
+                data = {"caseversion": case_version_uri,
+                        "instruction": local_step['instruction'],
+                        "expected": local_step['expected'],
+                        "number": step_no}
+                logging.info('POST ' + base_url)
+                resp = requests.post(base_url, params=user_params, data=json.dumps(data), headers=headers)
+                #step['resource_uri'] = resp.json()['resource_uri']
+                #step['caseversion'] = resp.json()['caseversion']
+                _check_respone_code(resp)
+            elif local_step is None: #and remote_step is not None:
+                base_url = mtorigin + remote_step['resource_uri']
+                params = copy.deepcopy(user_params)
+                params['permanent'] = True
+                resp = requests.delete(base_url, params=params)
+                _check_respone_code(resp)
                 #delete remote step
             else:
                 base_url = mtorigin + remote_step['resource_uri']
@@ -308,16 +330,17 @@ class MozTrapTestCase(object):
         self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) == 1:
             case_version_uri = self.case_version_objs[0]['resource_uri']
-            case_steps = self.case_version_objs[0]['steps']
+            #case_steps = self.case_version_objs[0]['steps']
+            case_steps = self.steps
             self._update_case_steps(case_version_uri, case_steps)
             if new_case_version_info:
                 self._update_case_version(case_version_uri, new_case_version_info)
 
-            if (not suites_added is None):
+            if (suites_added is not None):
                 case_uri = self._get_case_uri()
                 for suite in suites_added:
                     self._create_suite_case_relation(case_uri, suite)
-            if (not suites_removed is None):
+            if (suites_removed is not None):
                 case_uri = self._get_case_uri()
                 for suite in suites_removed:
                     self._delete_suite_case_relation(case_uri, suite)
