@@ -129,16 +129,20 @@ class MozTrapTestCase(object):
     def _delete_suite_case_relation(self, case_uri, suite_uri):
         logging.info("Removing the case " + case_uri + "from suite " + suite_uri)
         case_id = os.path.basename(os.path.dirname(case_uri))
-        suite_id = os.path.basename(os.path.dirname(case_uri))
+        suite_id = os.path.basename(os.path.dirname(suite_uri))
 
+        import pdb
+        pdb.set_trace()
         base_url = mtorigin + namespace_api_suitecase
         params = {'case': case_id, 'suite': suite_id}
         suitecase_resp = requests.get(base_url, params=params, headers=headers)
         _check_respone_code(suitecase_resp)
 
         suitecase_id = suitecase_resp.json()['objects'][0]['id']
-        logging.info('DELETE' + base_url)
-        resp = requests.delete(base_url + suitecase_id + "/", params=user_params, headers=headers)
+        logging.info('DELETE ' + base_url + str(suitecase_id) + "/")
+        params = copy.deepcopy(user_params)
+        params['permanent'] = True
+        resp = requests.delete(base_url + str(suitecase_id) + "/", params=params, headers=headers)
         _check_respone_code(resp)
         return resp
 
@@ -240,20 +244,23 @@ class MozTrapTestCase(object):
         return return_objs
 
     def _get_case_uri(self):
-        if not self.case_uri is None:
+        if self.case_uri is not None:
             return self.case_uri
-        return_objs = None
-        query_params = {"name": self.name, "product__name": self.product_name, "format": data_format}
-        base_url = mtorigin + namespace_api_case
-        resp = requests.get(base_url, params=query_params, headers=headers)
-        if resp.status_code == 404:
-            logging.error("can't find the test case with specify name: " + str(self.name))
-            return_objs = []
         else:
-            return_objs = resp.json()['objects']
-        #print return_objs
-        self.case_uri = return_objs[0]['resource_uri']
-        return self.case_uri
+            self.case_uri = self.case_version_objs[0]['case']
+            return self.case_uri
+        #return_objs = None
+        #query_params = {"name": self.name, "product__name": self.product_name, "format": data_format}
+        #base_url = mtorigin + namespace_api_case
+        #resp = requests.get(base_url, params=query_params, headers=headers)
+        #if resp.status_code == 404:
+            #logging.error("can't find the test case with specify name: " + str(self.name))
+            #return_objs = []
+        #else:
+            #return_objs = resp.json()['objects']
+        ##print return_objs
+        #self.case_uri = return_objs[0]['resource_uri']
+        #return self.case_uri
 
     def _clean_old_steps(self, case_steps):
         for step in case_steps:
@@ -335,7 +342,6 @@ class MozTrapTestCase(object):
             self._update_case_steps(case_version_uri, case_steps)
             if new_case_version_info:
                 self._update_case_version(case_version_uri, new_case_version_info)
-
             if (suites_added is not None):
                 case_uri = self._get_case_uri()
                 for suite in suites_added:
@@ -668,7 +674,9 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             #TODO: use different product for different suite?
             test_case_obj = _create_case_obj_from_parser_output(modifiedcase, product_info, suite_name_to_uri)
             #test_case_obj.existing_in_moztrap()
-            test_case_obj.update()
+            #TODO: add modifiedcase['suites-added/removed '] to update paramter
+            test_case_obj.update(suites_added = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_added']),
+                                 suites_removed = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_removed']))
 def _add_all_type_of_variables_if_exist(test_case_obj, case):
     for i in ('variables', 'variablesFromSuite'):
         try:
