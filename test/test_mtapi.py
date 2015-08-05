@@ -125,16 +125,16 @@ class TestMTApi(unittest.TestCase):
                       status=200,
                       content_type="application/json")
         responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",# + "?name=Firefox+OS&format=json",
-                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "case": "/api/v1/case/12345", "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
                       status=200,
                       content_type="application/json")
         responses.add(responses.GET, self.base_url + "/api/v1/" + "case/",# + "?name=Firefox+OS&format=json",
                       body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
                       status=200,
                       content_type="application/json")
-        responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",
-                      body='{"resource_uri": "/api/v1/caseversion/12345"}',
-                      status=201, content_type="application/json")
+        #responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",
+                      #body='{"resource_uri": "/api/v1/caseversion/12345"}',
+                      #status=201, content_type="application/json")
         responses.add(responses.POST, self.base_url + "/api/v1/" + "suitecase/",
                       body='{ "case": "/api/v1/case/88/", "id": 50, "order": 0, "resource_uri": "/api/v1/suitecase/50/", "suite": "/api/v1/suite/1/" }',
                       status=201, content_type="application/json")
@@ -168,7 +168,7 @@ class TestMTApi(unittest.TestCase):
         expecteds = [
             ("GET" , "product"),
             ("GET" , "caseversion"),
-            ("GET" , "case"),
+            #("GET" , "case"),
             ("POST", "suitecase"),
             ("GET", "suitecase"),
             ("DELETE", "suitecase")
@@ -541,6 +541,73 @@ class TestMTApi(unittest.TestCase):
         self._verify_call_order(expecteds, responses.calls)
         self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
 
+    @responses.activate
+    def test_suite_init_delete(self):
+        # verify the suite is deleted
+        # Should we also delete related suitecase?
+        #raise NotImplementedError
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ \
+                      { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "suite/",# + "?format=json&name=Test+Suite&product__name=Firefox+OS",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [{\
+                              "created_by": null,\
+                              "description": "This is an awesome suite",\
+                              "id": 888,\
+                              "modified_by": null,\
+                              "modified_on": "2012-03-01T19:38:14",\
+                              "name": "Test Suite",\
+                              "product": "/api/v1/product/115540/",\
+                              "resource_uri": "/api/v1/suite/888/",\
+                              "status": "active"\
+                      }]}',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.DELETE, self.base_url + "/api/v1/" + "suite/888",
+                      body='',
+                      status=200, content_type="application/json")
+        suite = [
+            'Test Suite',
+            'Firefox OS',
+            'v2.2',
+            'active',
+            'This is an awesome suite'
+        ]
+        test_suite_obj= mtapi.MozTrapTestSuite(*suite)
+
+        self.assertTrue(test_suite_obj.existing_in_moztrap())
+        self.assertEqual(test_suite_obj.suite_uri, "/api/v1/suite/888/")
+
+        fields = [
+            'name',
+            'product_name',
+            'product_uri',
+            'product_version',
+            'product_version_uri',
+            'description',
+            'status',
+            'suite_id',
+            'suite_uri',
+            'suite_objs',
+        ]
+
+        for field in fields:
+            self.assertNotEqual(getattr(test_suite_obj, field), None, field + " should not be None")
+
+        test_suite_obj.delete()
+
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+
+        expecteds = [
+            ("GET" , "product"),
+            ("GET", "suite"),
+            ("DELETE", "suite"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
 
     def _prepare_empty_diff(self):
         return ([
@@ -574,6 +641,18 @@ class TestMTApi(unittest.TestCase):
         mtapi.sync_diff_to_moztrap(diff_outs, {'username': "foo", 'api_key': "bar"})
         #self.assertTrue(mock_suites[0].create.called, "Create function was not called")
         mock_suites[0].create.assert_called_once_with()
+
+    @mock.patch('mtapi.MozTrapTestSuite', autospec=True)
+    def test_sync_diff_to_moztrap_delete_suite(self, mock_mttestsuite):
+
+        diff_outs = self._prepare_empty_diff()
+        diff_outs[0]['suite']['removed'] = ["Launch suite"]
+
+        mock_suites = [mock.Mock()]
+        mock_mttestsuite.side_effect = mock_suites
+        mtapi.sync_diff_to_moztrap(diff_outs, {'username': "foo", 'api_key': "bar"})
+        #self.assertTrue(mock_suites[0].create.called, "Create function was not called")
+        mock_suites[0].delete.assert_called_once_with()
 
     # The order of decorator is the opposite of the functon parameters
     @mock.patch('mtapi.MozTrapTestCase', autospec=True)
@@ -618,7 +697,10 @@ class TestMTApi(unittest.TestCase):
                             "instructions": "Launch FOOBAR",
                             "state": "draft",
                             "userStory": 1,
-                            "suites": ["Launch suite"]}
+                            "suites": ["Launch suite"],
+                            "suites_added": [],
+                            "suites_removed": []
+                          }
         diff_outs[0]['case']['modified'] = [expected_modify]
         diff_outs[0]['suite']['existing'] = ["Launch suite"]
         mock_suites = [mock.Mock()]
@@ -635,7 +717,7 @@ class TestMTApi(unittest.TestCase):
                                                 steps=self._fill_steps(expected_modify['instructions'])
                                                 )
 
-        mock_cases[0].update.assert_called_once_with()
+        mock_cases[0].update.assert_called_once_with(suites_added=[], suites_removed = [])
 
 
 if __name__ == '__main__':

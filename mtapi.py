@@ -131,8 +131,6 @@ class MozTrapTestCase(object):
         case_id = os.path.basename(os.path.dirname(case_uri))
         suite_id = os.path.basename(os.path.dirname(suite_uri))
 
-        import pdb
-        pdb.set_trace()
         base_url = mtorigin + namespace_api_suitecase
         params = {'case': case_id, 'suite': suite_id}
         suitecase_resp = requests.get(base_url, params=params, headers=headers)
@@ -664,6 +662,12 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             test_suite_obj.existing_in_moztrap()
             if (suite not in suite_name_to_uri):
                 suite_name_to_uri[suite] = test_suite_obj.suite_uri
+
+        for suite in diff['suite']['removed']:
+            #TODO: use different product for different suite?
+            test_suite_obj = MozTrapTestSuite(suite, product_info['name'], product_info['version'])
+            test_suite_obj.existing_in_moztrap()
+            test_suite_obj.delete()
 
         for newcase in diff['case']['added']:
             #TODO: use different product for different suite?
