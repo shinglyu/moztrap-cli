@@ -176,6 +176,52 @@ class TestMTApi(unittest.TestCase):
         self._verify_call_order(expecteds, responses.calls)
 
     @responses.activate
+    def test_testcase_object_update_status(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "case": "/api/v1/case/12345", "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.PUT, self.base_url + "/api/v1/" + "caseversion/142229/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "case": "/api/v1/case/12345", "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+                      status=200,
+                      content_type="application/json")
+        case = {
+            'id': '12345',
+            'productname': "Firefox OS",
+            'version': 'v2.2',
+            'state': 'active',
+            'suites': [],
+            'suites_added':[],
+            'suites_removed':[]
+        }
+        test_case_obj = mtapi.MozTrapTestCase(case['id'],
+                                        case['productname'],
+                                        case['version'],
+                                        status=case['state'],
+                                        suites=case['suites'])
+        #test_case_obj.add_step("open foo", "see bar")
+        #test_case_obj.add_step("close foo", "don't see bar")
+        #if test_case_obj.existing_in_moztrap():
+        #    test_case_obj.update(new_case_version_info={"name": case['id'], "status": case['state'], "tags":[]}, suites=[suite['name']])
+        #else:
+        test_case_obj.update(new_case_version_info={"name": case['id'],
+                                                    "status": case['state'],
+                                                    "tags":[]},
+                             suites_added = case['suites_added'],
+                             suites_removed = case['suites_removed'])
+
+        expecteds = [
+            ("GET" , "product"),
+            ("GET" , "caseversion"),
+            ("PUT" , "caseversion"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+
+    @responses.activate
     def test_testcase_object_add_step(self):
         responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
                       body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
@@ -742,6 +788,12 @@ class TestMTApi(unittest.TestCase):
                             "suites_added": [],
                             "suites_removed": []
                           }
+        expected_new_case_version_info = {
+            "name": expected_modify['id'],
+            "status": expected_modify['state'],
+            "tags": [],
+
+        }
         diff_outs[0]['case']['modified'] = [expected_modify]
         diff_outs[0]['suite']['existing'] = ["Launch suite"]
         mock_suites = [mock.Mock()]
@@ -758,7 +810,8 @@ class TestMTApi(unittest.TestCase):
                                                 steps=self._fill_steps(expected_modify['instructions'])
                                                 )
 
-        mock_cases[0].update.assert_called_once_with(suites_added=[], suites_removed = [])
+        mock_cases[0].update.assert_called_once_with(new_case_version_info=expected_new_case_version_info,
+                                                     suites_added=[], suites_removed = [])
 
     @mock.patch('mtapi.MozTrapTestCase', autospec=True)
     def test_sync_diff_to_moztrap_delete_case(self, mock_mttestcase):

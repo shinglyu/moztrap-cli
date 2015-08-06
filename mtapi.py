@@ -696,7 +696,13 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             test_case_obj = _create_case_obj_from_parser_output(modifiedcase, product_info, suite_name_to_uri)
             #test_case_obj.existing_in_moztrap()
             #TODO: add modifiedcase['suites-added/removed '] to update paramter
-            test_case_obj.update(suites_added = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_added']),
+            new_case_version_info = {
+                "name": modifiedcase['id'],
+                "status": modifiedcase['state'],
+                "tags": [],#TODO
+            }
+            test_case_obj.update(new_case_version_info=new_case_version_info,
+                                 suites_added = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_added']),
                                  suites_removed = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_removed']))
 
         for removecase in diff['case']['removed']:
