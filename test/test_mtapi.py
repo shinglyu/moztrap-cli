@@ -286,6 +286,47 @@ class TestMTApi(unittest.TestCase):
         self._verify_call_order(expecteds, responses.calls)
 
     @responses.activate
+    def test_testcase_object_delete(self):
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
+                      body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
+                      status=200,
+                      content_type="application/json")
+        with open('base_caseversion.json', 'r') as f:
+            caseversiontext = ''.join(f.readlines())
+        responses.add(responses.GET, self.base_url + "/api/v1/" + "caseversion/",# + "?name=Firefox+OS&format=json",
+                      #body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "id": 142229, "resource_uri": "/api/v1/caseversion/142229/", "steps":[]} ] }',
+                      body=caseversiontext,
+                      status=200,
+                      content_type="application/json")
+        responses.add(responses.DELETE, self.base_url + "/api/v1/" + "caseversion/88/",
+                      body='',
+                      status=200, content_type="application/json")
+        case = {
+            'id': '12345',
+            'productname': "Firefox OS",
+            'version': 'v2.2',
+            'status': 'active',
+            'suites': [],
+            'suites_added':[],
+            'suites_removed':[]
+        }
+        test_case_obj = mtapi.MozTrapTestCase(case['id'],
+                                        case['productname'],
+                                        case['version'],
+                                        status=case['status'],
+                                        suites=case['suites'])
+        test_case_obj.existing_in_moztrap()
+        self.assertEqual(test_case_obj.case_version_id, "88")
+        test_case_obj.delete()
+
+        expecteds = [
+            ("GET", "product"),
+            ("GET", "caseversion"),
+            ("DELETE", "caseversion"),
+        ]
+        self._verify_call_order(expecteds, responses.calls)
+
+    @responses.activate
     def test_create_suite_obj(self):
         responses.add(responses.GET, self.base_url + "/api/v1/" + "product/",# + "?name=Firefox+OS&format=json",
                       body='{ "meta": { "limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1 }, "objects": [ { "description": "", "id": 115540, "name": "Firefox OS", "productversions": [ { "codename": "", "id": 142229, "product": "/api/v1/product/115540/", "resource_uri": "/api/v1/productversion/142229/", "version": "v2.2" } ], "resource_uri": "/api/v1/product/115540/" } ] }',
@@ -718,6 +759,34 @@ class TestMTApi(unittest.TestCase):
                                                 )
 
         mock_cases[0].update.assert_called_once_with(suites_added=[], suites_removed = [])
+
+    @mock.patch('mtapi.MozTrapTestCase', autospec=True)
+    def test_sync_diff_to_moztrap_delete_case(self, mock_mttestcase):
+        #raise NotImplementedError
+
+        diff_outs = self._prepare_empty_diff()
+        expected_remove= {
+                            "bug": 2,
+                            "id": "fxos.func.sanity.launch_foobar",
+                            "instructions": "Launch FOOBAR",
+                            "state": "draft",
+                            "userStory": 1,
+                            "suites": [],
+                          }
+        diff_outs[0]['case']['removed'] = [expected_remove]
+        mock_cases= [mock.Mock()]
+        mock_mttestcase.side_effect = mock_cases
+        mtapi.sync_diff_to_moztrap(diff_outs, {'username': "foo", 'api_key': "bar"})
+        #self.assertTrue(mock_suites[0].create.called, "Create function was not called")
+        mock_mttestcase.assert_called_once_with(name=expected_remove['id'],
+                                                product_name="Firefox OS",
+                                                product_version="v2.2",
+                                                status=expected_remove['state'],
+                                                suites=[],
+                                                steps=self._fill_steps(expected_remove['instructions'])
+                                                )
+
+        mock_cases[0].delete.assert_called_once_with()
 
 
 if __name__ == '__main__':

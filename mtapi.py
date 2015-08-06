@@ -170,6 +170,8 @@ class MozTrapTestCase(object):
         logging.info("Checking if the test case exists in moztrap")
         self.case_version_objs = self._get_case_version_objs()
         if len(self.case_version_objs) > 0:
+            if len(self.case_version_objs) == 1:
+                self.case_version_id = self.case_version_objs[0]['id']
             return True
         else:
             return False
@@ -215,6 +217,19 @@ class MozTrapTestCase(object):
         case_version_uri = case_version_uri_resp['resource_uri']
         self._create_test_steps(case_version_uri)
         return case_version_uri_resp
+
+    def delete(self):
+        logging.info("Delete the test case in moztrap")
+
+        if self.case_version_id is None:
+            logging.error("Please specify the suite id want to kill!")
+
+        base_url = mtorigin + namespace_api_case_version
+        request_url = base_url + str(self.case_version_id) + "/"
+        logging.info('DELETE' + request_url)
+        resp = requests.delete(request_url, params=user_params, headers=headers)
+        _check_respone_code(resp)
+        return resp
 
     def _get_case_version_objs(self):
         return_objs = None
@@ -648,6 +663,7 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
         # TODO: read product from test case namespace id
         product_info = {'name': config.defaultProduct, 'version': config.defaultVersion}
     suite_name_to_uri = {}
+    suite_remove_queue = []
     for diff in diffs:
         for newsuite in diff['suite']['added']:
             #TODO: use different product for different suite?
@@ -667,7 +683,8 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             #TODO: use different product for different suite?
             test_suite_obj = MozTrapTestSuite(suite, product_info['name'], product_info['version'])
             test_suite_obj.existing_in_moztrap()
-            test_suite_obj.delete()
+            suite_name_to_uri[suite] = test_suite_obj.suite_uri
+            suite_remove_queue.append(test_suite_obj)
 
         for newcase in diff['case']['added']:
             #TODO: use different product for different suite?
@@ -681,6 +698,20 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             #TODO: add modifiedcase['suites-added/removed '] to update paramter
             test_case_obj.update(suites_added = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_added']),
                                  suites_removed = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_removed']))
+
+        for removecase in diff['case']['removed']:
+            #TODO: use different product for different suite?
+            test_case_obj = _create_case_obj_from_parser_output(removecase, product_info, suite_name_to_uri)
+            #test_case_obj.existing_in_moztrap()
+            #TODO: add modifiedcase['suites-added/removed '] to update paramter
+            test_case_obj.existing_in_moztrap()
+            test_case_obj.delete()
+
+        # Suites need to removed last, since it's suitecase relation will be
+        # deleted in previous steps
+        for suite_obj in suite_remove_queue:
+            suite_obj.delete()
+
 def _add_all_type_of_variables_if_exist(test_case_obj, case):
     for i in ('variables', 'variablesFromSuite'):
         try:
