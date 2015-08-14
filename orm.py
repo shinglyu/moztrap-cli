@@ -81,3 +81,22 @@ def parseURL(url):
     import re
     p = re.compile(ur'\/api\/v1\/(.*)\/(.*)\/')
     return  re.findall(p, url)[0] # (resource_type, rid)
+
+
+def parseCaseStep(case_step_txt):
+    def parseStep(index, step_txt):
+        step = {}
+        step["instruction"] = step_txt[0].strip()
+        step["expected"] = step_txt[1].strip()
+        step["number"] = index
+        return step
+
+    regex = re.compile(ur'WHEN(.*?)\nTHEN([^\n]*)', re.IGNORECASE | re.DOTALL)
+    steps = re.findall(regex, case_step_txt)
+
+    case_step = []
+
+    for index, step in enumerate(steps):
+        case_step.append(parseStep(index + 1, step))
+
+    return case_step
