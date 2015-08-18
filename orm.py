@@ -6,23 +6,18 @@ def formatCaseversion(caseversion):
     # Downloaded json obj => plaintext
     # FIXME: remove this try catch when resource uri is parsed
     #print(caseversion)
-    try:
-        txt = "{{ \"resource_uri\":\"{uri}\" }}\n".format(uri=caseversion[u'resource_uri'])
-    except KeyError:
-        txt = ""
-        logging.error("Can't find resource_uri")
+    txt = ""
 
-    txt += ("TEST THAT {name}\n"
-           "{desc}\n"
-           "\n"
-          ).format(name=caseversion['name'],
-                   desc=caseversion['description'])
+    txt += ("## {name}\n"
+            "`{status}`\n"
+           ).format(name=caseversion['name'],
+                    status=caseversion['status'])
     for step in caseversion['steps']:
         txt += ("WHEN {instr}\n"
                 "THEN {expected}\n"
                 "\n"
-               ).format(instr=step['instruction'],
-                        expected=step['expected'])
+               ).format(instr=step['instruction'].replace('\015',''),
+                        expected=step['expected'].replace('\015',''))
     return txt
 
 
@@ -52,13 +47,12 @@ def parseCaseversion(caseversion_txt):
     return caseversion
 
 
-def formatSuite(suite, sid):
+def formatSuite(suite, sname):
     # TODO: sort by product version
     sortedCaseVersions= sorted(suite['objects'], key=lambda k: k['id'])
-    txt = "{{ \"resource_uri\":\"/api/v1/suite/{sid}/\" }}\n".format(sid=sid)
+    txt = "# {sname}\n".format(sname=sname)
     for caseversion in sortedCaseVersions:
         txt += formatCaseversion(caseversion)
-        txt += "\n=====\n\n"
     return txt
 
 
