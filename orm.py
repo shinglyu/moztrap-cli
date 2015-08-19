@@ -96,6 +96,9 @@ def parseCaseStep(case_step_txt):
 
     case_step = []
 
+    if len(steps) == 0:
+        return parseStep(0, [case_step_txt, ''])
+
     for index, step in enumerate(steps):
         case_step.append(parseStep(index + 1, step))
 
