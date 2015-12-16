@@ -654,7 +654,8 @@ def _create_case_obj_from_parser_output(parser_output, product_info, suite_name_
                            product_version=product_info['version'],
                            status=parser_output['state'],
                            suites=map(lambda x: suite_name_to_uri[x], parser_output['suites']),
-                           steps=steps
+                           steps=steps,
+                           description=parser_output['description']
                           )
 
 def sync_diff_to_moztrap(diffs, credential, product_info=None):
@@ -700,6 +701,7 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
                 "name": modifiedcase['id'],
                 "status": modifiedcase['state'],
                 "tags": [],#TODO
+                "description": modifiedcase['description'],#TODO
             }
             test_case_obj.update(new_case_version_info=new_case_version_info,
                                  suites_added = map(lambda x: suite_name_to_uri[x], modifiedcase['suites_added']),
