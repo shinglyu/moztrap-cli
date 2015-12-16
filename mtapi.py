@@ -79,11 +79,12 @@ class MozTrapTestCase(object):
     case_uri = None
 
     def __init__(self, name, product_name, product_version, case_version_id=None,
-                 status="active", description=None, steps=None, id_prefix=mz_case_id_prefix, suites=None):
+                 status="active", description=None, steps=None, id_prefix=mz_case_id_prefix, suites=None, tags=None):
         self.name, self.description, self.status, self.case_version_id = name, description, status, case_version_id
         self.suites = copy.deepcopy(suites)
         self.product_name, self.product_version = product_name, product_version
         self.product_uri, self.product_version_uri = get_product_uri(product_name, product_version)
+        self.tags = copy.deepcopy(tags)
         if (steps is None): #http://stackoverflow.com/questions/1132941/least-astonishment-in-python-the-mutable-default-argument
             self.steps = []
         else:
@@ -352,6 +353,7 @@ class MozTrapTestCase(object):
             case_version_uri = self.case_version_objs[0]['resource_uri']
             #case_steps = self.case_version_objs[0]['steps']
             case_steps = self.steps
+            #TODO: update tags and description?
             self._update_case_steps(case_version_uri, case_steps)
             if new_case_version_info:
                 self._update_case_version(case_version_uri, new_case_version_info)
@@ -663,7 +665,8 @@ def _create_case_obj_from_parser_output(parser_output, product_info, suite_name_
                            status=parser_output['state'],
                            suites=map(lambda x: suite_name_to_uri[x], parser_output['suites']),
                            steps=steps,
-                           description=parser_output['description']
+                           description=parser_output['description'],
+                           tags=parser_output['tags']
                           )
 
 def sync_diff_to_moztrap(diffs, credential, product_info=None):
@@ -708,7 +711,7 @@ def sync_diff_to_moztrap(diffs, credential, product_info=None):
             new_case_version_info = {
                 "name": modifiedcase['id'],
                 "status": modifiedcase['state'],
-                "tags": [],#TODO
+                "tags": modifiedcase['tags'],
                 "description": modifiedcase['description'],#TODO
             }
             test_case_obj.update(new_case_version_info=new_case_version_info,
