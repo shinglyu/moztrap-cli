@@ -146,11 +146,16 @@ class MozTrapTestCase(object):
         return resp
 
     def _create_test_case_version(self, case_uri):
+        tag_uris = []
+        for tag in self.tags:
+            tag_uri = self.add_tag(tag, "")
+            tag_uris.append(tag_uri)
+        # FIXME: Tags not working in API, blocked by
+        # https://github.com/mozilla/moztrap/pull/101/
         test_data = {"productversion": self.product_version_uri, "case": case_uri, "name": self.name,
-                     "description": self.description, "status": self.status, "tags": self.tags}
+                     "description": self.description, "status": self.status, "tags": tag_uris}
         base_url = mtorigin + namespace_api_case_version
         resp = requests.post(base_url, params=user_params, data=json.dumps(test_data), headers=headers)
-        _check_respone_code(resp)
         return resp
 
     def _get_tag_uri(self, name):
@@ -199,13 +204,14 @@ class MozTrapTestCase(object):
         self.steps.append({"instruction": instruction, "expected": expected, "number": number})
 
     def add_tag(self, name, description=None):
-        logging.info("Adding tag to case " + self.name)
+        logging.info("Adding tag {} to case {}".format(name, self.name))
         tag_uri_resp = self._get_tag_uri(name).json()
         if len(tag_uri_resp['objects']) > 0:
             tag_uri = tag_uri_resp['objects'][0]['resource_uri']
         else:
             tag_uri = self._create_tag(name, description).json()['resource_uri']
-        self.tags.append(tag_uri)
+        return tag_uri
+        #self.tags.append(tag_uri)
 
     def create(self):
         logging.info("Creating the test case in moztrap")
