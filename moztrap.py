@@ -17,29 +17,32 @@ def main():
 
     parser_clone = subparsers.add_parser('clone')
     parser_clone.add_argument('resource_type', type=str,
-                              choices=['caseversion', 'case', 'suite'], help="Resource type")
+                              #choices=['caseversion', 'case', 'suite'], help="Resource type")
+                              choices=['suite'], help="Resource type")
     parser_clone.add_argument('id', type=int, help="Resource ID")
 
-    parser_diff = subparsers.add_parser('diff')
-    parser_diff.add_argument('filename', type=str, help="File to be diffed")
 
-    parser_push = subparsers.add_parser('push')
-    parser_push.add_argument('-f', '--force', action="store_true",
-                             help="Force overwrite (BE CAREFUL!)", required=True)
-    parser_push.add_argument('filename', type=str, help="File to be pushed")
-    parser_push.add_argument('-u', '--username',
-                             help="MozTrap username", required=True)
-    parser_push.add_argument('-k', '--api_key',
-                             help="MozTrap api key", required=True)
+#    parser_diff = subparsers.add_parser('diff')
+#    parser_diff.add_argument('filename', type=str, help="File to be diffed")
+#
+#    parser_push = subparsers.add_parser('push')
+#    parser_push.add_argument('-f', '--force', action="store_true",
+#                             help="Force overwrite (BE CAREFUL!)", required=True)
+#    parser_push.add_argument('filename', type=str, help="File to be pushed")
+#    parser_push.add_argument('-u', '--username',
+#                             help="MozTrap username", required=True)
+#    parser_push.add_argument('-k', '--api_key',
+#                             help="MozTrap api key", required=True)
+#
+#    parser_push = subparsers.add_parser('create')
+#    # parser_push.add_argument('-f', '--force', action="store_true",
+#    #                          help="Force overwrite (BE CAREFUL!)", required=True)
+#    parser_push.add_argument('filename', type=str, help="File to be created")
+#    parser_push.add_argument('-u', '--username',
+#                             help="MozTrap username", required=True)
+#    parser_push.add_argument('-k', '--api_key',
+#                             help="MozTrap api key", required=True)
 
-    parser_push = subparsers.add_parser('create')
-    # parser_push.add_argument('-f', '--force', action="store_true",
-    #                          help="Force overwrite (BE CAREFUL!)", required=True)
-    parser_push.add_argument('filename', type=str, help="File to be created")
-    parser_push.add_argument('-u', '--username',
-                             help="MozTrap username", required=True)
-    parser_push.add_argument('-k', '--api_key',
-                             help="MozTrap api key", required=True)
     args = parser.parse_args()
 
     # #print args

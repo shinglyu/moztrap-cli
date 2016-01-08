@@ -4,35 +4,20 @@ MozTrap CLI
 A command-line tool for downloading, editing and uploading test cases from/to MozTrap
 
 # Usage
-Download a test case as plaintext file:
 
-```
-python moztrap.py clone case <case_id>
-
-```
-
-Download a test suite as plaintext file: (you can find the suite id in a suite's shareable link)
+* Install dependencies by `bash install.sh`
+* Download a test suite as Excel file (xlsx): (you can find the suite id in a suite's shareable link)
 
 ```
 python moztrap.py clone suite <suite_id>
 
 ```
 
-Then, edit the downloaded file with your favorite text editor
+* Upload the Excel file to google spreadsheet
+* Edit the test cases as you like
+* Use [MozIlluminate](https://github.com/MozIlluminate/mozilluminate-demo) to sync the cases back to MozTrap
 
-See the diff between your version and the latest remote version
-
-```
-python moztrap.py diff case_<case_id>.txt
-```
-
-Push the test case back to MozTrap
-
-```
-python moztrap.py push --force -u <username> -k <api_key> case_<case_id>.txt
-```
-
-__Warning: this will force override the remote version__
+> Warning: MozIlluminate-demo only pushes to moztrap-dev server right now. Please send an email to us to support MozIlluminate to go on production.
 
 #Configuration
 Edit the `config.py` file to change:

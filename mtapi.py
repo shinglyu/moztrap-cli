@@ -4,6 +4,7 @@ import os
 import logging
 import requests
 import copy
+from openpyxl import Workbook
 
 import config
 import orm
@@ -556,11 +557,22 @@ def clone(resource_type, sid, dirname="./"):
         result = downloadCaseversionByCaseId(query)
         output = orm.formatCaseversion(result)
 
-    filename = dirname + resource_type + "_" + str(sid) + ".txt"
+    filename = dirname + resource_type + "_" + str(sid) + ".xlsx"
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
-    with open(filename, 'w') as file_:
-            file_.write(output)
+    #with open(filename, 'w') as file_:
+    #        file_.write(output)
+
+    wb = Workbook()
+    ws = wb.active
+
+    colTitles = ["Purpose","Plan","Tid","Test case","Description","Steps","Tags","Note","UX spec"]
+    ws.append(colTitles)
+    for row in output:
+        print row
+        ws.append(row)
+
+    wb.save(filename)
     logging.info(filename + " created")
 
     return filename

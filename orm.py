@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import json
 import logging
@@ -5,20 +6,26 @@ import logging
 def formatCaseversion(caseversion):
     # Downloaded json obj => plaintext
     # FIXME: remove this try catch when resource uri is parsed
-    #print(caseversion)
-    txt = ""
+    # print(json.dumps(caseversion, indent=2))
 
-    txt += ("## {name}\n"
-            "`{status}`\n"
-           ).format(name=caseversion['name'],
-                    status=caseversion['status'])
+    steps = ""
     for step in caseversion['steps']:
-        txt += ("WHEN {instr}\n"
-                "THEN {expected}\n"
-                "\n"
-               ).format(instr=step['instruction'].replace('\015',''),
-                        expected=step['expected'].replace('\015',''))
-    return txt
+        steps += "{instr}\n  >>> {expected}\n\n".format(instr=step['instruction'].replace('\015','').encode('utf8'),
+                        expected=step['expected'].replace('\015','').encode('utf8'))
+
+    # print(steps)
+    #txt = "{purpose},{plan},{tid},{test_case_name},{description},{steps},{tags},{note},{ux_spec}"
+    #return txt
+    #print caseversion['tags']
+    return ["",#plan
+            caseversion['id'], #tid
+            caseversion['name'],
+            caseversion['description'],
+            steps,
+            ",".join([t['name'] for t in caseversion['tags']]),
+            "", #note
+            "" #uxspec
+           ]
 
 
 def parseCaseversion(caseversion_txt):
@@ -50,10 +57,11 @@ def parseCaseversion(caseversion_txt):
 def formatSuite(suite, sname):
     # TODO: sort by product version
     sortedCaseVersions= sorted(suite['objects'], key=lambda k: k['id'])
-    txt = "# {sname}\n".format(sname=sname)
+    #txt = "# {sname}\n".format(sname=sname)
+    cases = []
     for caseversion in sortedCaseVersions:
-        txt += formatCaseversion(caseversion)
-    return txt
+        cases.append([sname] + formatCaseversion(caseversion))
+    return cases
 
 
 def parseSuite(suite_txt):
