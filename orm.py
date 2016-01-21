@@ -9,9 +9,12 @@ def formatCaseversion(caseversion):
     # print(json.dumps(caseversion, indent=2))
 
     steps = ""
-    for step in caseversion['steps']:
-        steps += "{instr}\n  >>> {expected}\n\n".format(instr=step['instruction'].replace('\015','').encode('utf8'),
-                        expected=step['expected'].replace('\015','').encode('utf8'))
+    for num, step in enumerate(caseversion['steps']):
+        steps += "{num}. {instr}\n  >>> {expected}\n\n".format(
+            num=num,
+            instr=step['instruction'].replace('\015','').encode('utf8'),
+            expected=step['expected'].replace('\015','').encode('utf8')
+        )
 
     # print(steps)
     #txt = "{purpose},{plan},{tid},{test_case_name},{description},{steps},{tags},{note},{ux_spec}"
