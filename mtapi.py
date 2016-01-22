@@ -523,7 +523,8 @@ def downloadSuiteById(sid):
     url = (mtorigin + "/api/v1/caseversion/"
            "?case__suites={sid}"
            "&limit=0&format=json"
-          ).format(sid=sid, productversion=productversion)
+           "&productversion__version={pversion}"
+          ).format(sid=sid, pversion=productversion)
     #logging.debug(url)
     data = urllib2.urlopen(url).read()
     return json.loads(data)
@@ -546,6 +547,8 @@ def clone(resource_type, sid, dirname="./"):
     elif resource_type == "suite":
         query = str(sid)
         logging.info("Downloading Suite " + query + " ...")
+        import pdb
+        pdb.set_trace()
         result = downloadSuiteById(query)
         sname = getSuiteName(sid)
         output = orm.formatSuite(result, sname)
