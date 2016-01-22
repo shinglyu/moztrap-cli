@@ -11,7 +11,8 @@ def formatCaseversion(caseversion):
     steps = ""
     for num, step in enumerate(caseversion['steps']):
         steps += "{num}. {instr}\n  >>> {expected}\n\n".format(
-            num=num,
+        #steps += "{num}. {instr}$  >>> {expected}$$".format(
+            num=(num + 1),
             instr=step['instruction'].replace('\015','').encode('utf8'),
             expected=step['expected'].replace('\015','').encode('utf8')
         )
@@ -32,28 +33,13 @@ def formatCaseversion(caseversion):
 
 
 def parseCaseversion(caseversion_txt):
-    # plaintext => json obj
-    def parseStep((index, step_txt)):
-        step = {}
-        step["instruction"] = step_txt[0].strip()
-        step["expected"] = step_txt[1].strip()
-        step["number"] = index
-        return step
 
-    p = re.compile(ur'TEST THAT(.*?)\n(.*?)(WHEN.*)', re.IGNORECASE | re.DOTALL)
-
-    (title, desc, steps_txt) = re.findall(p, caseversion_txt)[0]
-
-    sre = re.compile(ur'WHEN(.*?)THEN(.*?)\n', re.IGNORECASE | re.DOTALL)
-    steps = re.findall(sre, steps_txt)
     caseversion = {}
-    #caseversion['resource_uri'] = uri.strip()
-    caseversion['name'] = title.strip()
-    caseversion['description'] = desc.strip()
-    caseversion['steps'] = map(parseStep, enumerate(steps, start=1))
-    #logging.info("hi")
-    #return json.dumps(caseversion)
-    # TODO: compose it as a valid moztrap json
+    #TODO: handle id, tags
+    caseversion['name'] = caseversion_txt[2]
+    caseversion['description'] = caseversion_txt[3]
+
+    caseversion['steps'] = parseCaseStep(caseversion_txt[4])
     return caseversion
 
 
@@ -91,13 +77,18 @@ def parseURL(url):
 def parseCaseStep(case_step_txt):
     def parseStep(index, step_txt):
         step = {}
-        step["instruction"] = step_txt[0].strip()
-        step["expected"] = step_txt[1].strip()
+        # TODO: step_txt[0] is the number, should we use it?
+        step_components = step_txt[1].split('>>>')
+        step["instruction"] = step_components[0].strip()
+        if len(step_components) == 2:
+            step["expected"] = step_components[1].strip()
+        else:
+            step["expected"] = ""
         step["number"] = index
         return step
 
-    regex = re.compile(ur'WHEN(.*?)\nTHEN([^\n]*)', re.IGNORECASE | re.DOTALL)
-    steps = re.findall(regex, case_step_txt)
+    sre = re.compile(ur'([\d]+\.)(.*?)(?=[\d]+\.|$)', re.DOTALL)
+    steps = re.findall(sre, case_step_txt)
 
     case_step = []
 
