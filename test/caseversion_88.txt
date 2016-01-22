@@ -1,10 +1,9 @@
-{ "resource_uri":"/api/v1/caseversion/88/" }
-TEST THAT Able to search test runs
-Able to search test runs
+1. Able to search test runs
+  >>> Able to search test runs
 
-WHEN when Log in> Manage> Runs> Enter data in search field> click 'update the list'
-THEN then Test run results display matching search results
+2. when Log in> Manage> Runs> Enter data in search field> click 'update the list'
+  >>> then Test run results display matching search results
 
-WHEN when Enter search criteria for: status, product, testcycle, name, tester, environment, creator> click 'update the list'
-THEN then Test run results display matching search results
+3. when Enter search criteria for: status, product, testcycle, name, tester, environment, creator> click 'update the list'
+  >>> then Test run results display matching search results
 
