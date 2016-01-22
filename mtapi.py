@@ -548,6 +548,8 @@ def clone(resource_type, sid, dirname="./"):
         logging.info("Downloading Suite " + query + " ...")
         result = downloadSuiteById(query)
         sname = getSuiteName(sid)
+        import pdb
+        pdb.set_trace()
         output = orm.formatSuite(result, sname)
 
     elif resource_type == "case":
